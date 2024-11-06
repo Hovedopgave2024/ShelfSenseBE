@@ -1,0 +1,19 @@
+name: Restrict Main Pull Requests
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  restrict-main-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check base branch
+        if: github.event.pull_request.base.ref == 'main'
+        run: |
+          if [ "${{ github.event.pull_request.head.ref }}" != "QA" ]; then
+            echo "Pull requests to 'main' are only allowed from the 'QA' branch."
+            exit 1
+          else
+            echo "Valid pull request to 'main' from 'QA' branch."
+          fi
