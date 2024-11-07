@@ -1,14 +1,14 @@
 package com.example.shelfsensebe.Repository;
 
-import com.example.shelfsensebe.Model.Product;
+import com.example.shelfsensebe.Model.Component;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Integer> {
+public interface ComponentRepository extends JpaRepository<Component, Integer> {
 
-    List<Product> findByUserId(int userId);
+    List<Component> findByUserId(int userId);
 
 }
