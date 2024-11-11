@@ -17,11 +17,16 @@ public class User
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "password", nullable = false)
     private String password;
 
-    private String picture;
+    @Lob
+    @Column(name = "picture", nullable = true)
+    private byte[] picture;
+
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user")

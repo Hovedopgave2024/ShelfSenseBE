@@ -21,8 +21,9 @@ public class Product
     @Column(name = "price", nullable = false)
     private double price;
 
+    @Lob
     @Column(name = "picture", nullable = true)
-    private String picture;
+    private byte[] picture;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "product")

@@ -23,8 +23,9 @@ public class Component
     @Column(name = "type", nullable = false)
     private String type;
 
+    @Lob
     @Column(name = "picture", nullable = true)
-    private String picture;
+    private byte[] picture;
 
     @Column(name = "designator", nullable = false)
     private String designator;
