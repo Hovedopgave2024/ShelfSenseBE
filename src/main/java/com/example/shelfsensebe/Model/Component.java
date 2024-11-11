@@ -36,6 +36,9 @@ public class Component
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
+    @Column(name = "safety_stock", nullable = false)
+    private int safetyStock;
+
     @Column(name = "manufacturer", nullable = false)
     private String manufacturer;
 
