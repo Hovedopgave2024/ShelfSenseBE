@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-public interface UserRespository extends JpaRepository<User, Integer>
+public interface UserRepository extends JpaRepository<User, Integer>
 {
 
-    Optional<User> findByUsername(String name);
+    Optional<User> findByName(String name);
 }

@@ -1,7 +1,7 @@
 package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.Model.User;
-import com.example.shelfsensebe.Repository.UserRespository;
+import com.example.shelfsensebe.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,22 +13,19 @@ import java.util.Optional;
 public class UserController
 {
     @Autowired
-    UserRespository userRespository;
+    UserRepository userRepository;
 
     @PostMapping("/createUser")
-    public User createUser(@RequestParam String name, @RequestParam String password)
+    public User createUser(@RequestBody User user)
     {
-        User user = new User();
-        user.setName(name);
-        user.setPassword(password);
-        return userRespository.save(user);
+        return userRepository.save(user);
     }
 
 
     @PostMapping("/loginUser")
     public ResponseEntity<String> login(@RequestParam String name, @RequestParam String password) {
 
-        Optional<User> userOptional = userRespository.findByUsername(name);
+        Optional<User> userOptional = userRepository.findByName(name);
 
         if (userOptional.isPresent() && userOptional.get().getPassword().equals(password)) {
             return ResponseEntity.ok("Login successful");
