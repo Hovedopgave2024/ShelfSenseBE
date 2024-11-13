@@ -15,6 +15,7 @@ public class UserController
     @Autowired
     UserRepository userRepository;
 
+    @CrossOrigin
     @PostMapping("/users")
     public User users(@RequestBody User user)
     {
@@ -24,7 +25,7 @@ public class UserController
         return userRepository.save(user);
     }
 
-
+    @CrossOrigin
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user) {
 
