@@ -28,18 +28,17 @@ public class User
     private byte[] picture;
 
 
-    @JsonManagedReference
+    @JsonManagedReference("user-componentList")
     @OneToMany(mappedBy = "user")
     private List<Component> componentList;
 
-    @JsonManagedReference
+    @JsonManagedReference("user-productList")
     @OneToMany(mappedBy = "user")
     private List<Product> productList;
 
-    @JsonManagedReference
+    @JsonManagedReference("user-salesOrderList")
     @OneToMany(mappedBy = "user")
     private List<SalesOrder> salesOrderList;
-
 
 
 }

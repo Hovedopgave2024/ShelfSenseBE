@@ -1,6 +1,7 @@
 package com.example.shelfsensebe.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -51,11 +52,11 @@ public class Component
     @Column(name = "supplier_part", nullable = false)
     private String supplierPart;
 
-    @JsonBackReference
+    @JsonManagedReference("component-productComponentList")
     @OneToMany(mappedBy = "component")
     private List<ProductComponent> productComponentList;
 
-    @JsonBackReference
+    @JsonBackReference("user-componentList")
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
