@@ -41,5 +41,4 @@ public class User
     private List<SalesOrder> salesOrderList;
 
 
-
 }
