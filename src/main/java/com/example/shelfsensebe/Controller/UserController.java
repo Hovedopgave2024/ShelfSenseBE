@@ -16,10 +16,14 @@ public class UserController
     UserRespository userRespository;
 
     @PostMapping("/createUser")
-    public User createUser(@RequestBody User user)
+    public User createUser(@RequestParam String name, @RequestParam String password)
     {
+        User user = new User();
+        user.setName(name);
+        user.setPassword(password);
         return userRespository.save(user);
     }
+
 
     @PostMapping("/loginUser")
     public ResponseEntity<String> login(@RequestParam String name, @RequestParam String password) {
