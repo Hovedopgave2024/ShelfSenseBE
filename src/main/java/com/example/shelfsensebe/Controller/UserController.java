@@ -16,17 +16,16 @@ public class UserController
     @Autowired
     UserRepository userRepository;
 
-    @CrossOrigin
     @PostMapping("/users")
-    public User users(@RequestBody User user)
-    {
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         if (userRepository.findByName(user.getName()).isPresent()) {
-            throw new IllegalArgumentException("User with name: " + user.getName() + " already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("User with name: " + user.getName() + " already exists");
         }
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    @CrossOrigin
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User user, HttpSession session) {
 
@@ -40,20 +39,18 @@ public class UserController
         return ResponseEntity.ok("Login successful");
     }
 
-    @CrossOrigin
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok("Logout successful");
     }
 
-    @CrossOrigin
     @GetMapping("/session")
     public ResponseEntity<String> sessionStatus(HttpSession session) {
-        String userId = (String) session.getAttribute("user");
-        if (userId == null) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session");
         }
-        return ResponseEntity.ok("User with id: " + userId + " is logged in");
+        return ResponseEntity.ok("User with id: " + userDTO.getId() + " is logged in");
     }
 }
