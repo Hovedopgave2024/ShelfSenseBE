@@ -1,6 +1,6 @@
 package com.example.shelfsensebe.Controller;
 
-import com.example.shelfsensebe.Model.Component;
+import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Product;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import jakarta.servlet.http.HttpSession;
@@ -22,10 +22,11 @@ public class ProductController {
     @CrossOrigin
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getProducts(HttpSession session) {
-        String userName = (String) session.getAttribute("user");
-        if (userName == null) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(productRepository.findByName(userName));
+        int userId = userDTO.getId();
+        return ResponseEntity.ok(productRepository.findByUserId(userId));
     }
 }
