@@ -6,6 +6,7 @@ import com.example.shelfsensebe.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.shelfsensebe.DTO.UserDTO;
 
 import java.util.Optional;
 
@@ -31,12 +32,12 @@ public class UserController
 
         Optional<User> userOptional = userRepository.findByName(user.getName());
 
-        if (userOptional.isPresent() && userOptional.get().getPassword().equals(user.getPassword())) {
-            session.setAttribute("user", userOptional.get().getName());
-            return ResponseEntity.ok("Login successful");
-        } else {
+        if (userOptional.isEmpty() || !userOptional.get().getPassword().equals(user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
+        UserDTO userDTO = new UserDTO(userOptional.get().getId(), userOptional.get().getName());
+        session.setAttribute("user", userDTO);
+        return ResponseEntity.ok("Login successful");
     }
 
     @CrossOrigin
@@ -47,13 +48,12 @@ public class UserController
     }
 
     @CrossOrigin
-    @GetMapping("/session-status")
+    @GetMapping("/session")
     public ResponseEntity<String> sessionStatus(HttpSession session) {
-        String userName = (String) session.getAttribute("user");
-        if (userName != null) {
-            return ResponseEntity.ok("User " + userName + " is logged in");
-        } else {
+        String userId = (String) session.getAttribute("user");
+        if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session");
         }
+        return ResponseEntity.ok("User with id: " + userId + " is logged in");
     }
 }

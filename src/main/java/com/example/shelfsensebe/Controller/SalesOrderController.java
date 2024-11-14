@@ -22,5 +22,4 @@ public class SalesOrderController {
     public List<SalesOrder> getSalesOrder() {
         return salesOrderRepository.findAll();
     }
-
 }

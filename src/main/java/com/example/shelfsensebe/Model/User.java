@@ -1,9 +1,5 @@
 package com.example.shelfsensebe.Model;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,7 +23,6 @@ public class User
     @Column(name = "picture", nullable = true)
     private byte[] picture;
 
-
     @JsonManagedReference("user-componentList")
     @OneToMany(mappedBy = "user")
     private List<Component> componentList;
@@ -39,6 +34,4 @@ public class User
     @JsonManagedReference("user-salesOrderList")
     @OneToMany(mappedBy = "user")
     private List<SalesOrder> salesOrderList;
-
-
 }
