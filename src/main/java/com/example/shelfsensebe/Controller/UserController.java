@@ -45,4 +45,14 @@ public class UserController
         session.invalidate();
         return ResponseEntity.ok("Logout successful");
     }
+
+    // Checking if session is active
+    @GetMapping("/session")
+    public ResponseEntity<String> sessionStatus(HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session");
+        }
+        return ResponseEntity.ok("User with id: " + userDTO.getId() + " is logged in");
+    }
 }
