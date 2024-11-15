@@ -17,10 +17,8 @@ public class SalesOrderController {
     @Autowired
     SalesOrderRepository salesOrderRepository;
 
-    @CrossOrigin
     @GetMapping("/salesorders")
     public List<SalesOrder> getSalesOrder() {
         return salesOrderRepository.findAll();
     }
-
 }
