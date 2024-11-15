@@ -1,9 +1,5 @@
 package com.example.shelfsensebe.Model;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,24 +13,25 @@ public class User
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "password", nullable = false)
     private String password;
 
-    private String picture;
+    @Lob
+    @Column(name = "picture", nullable = true)
+    private byte[] picture;
 
-    @JsonManagedReference
+    @JsonManagedReference("user-componentList")
     @OneToMany(mappedBy = "user")
     private List<Component> componentList;
 
-    @JsonManagedReference
+    @JsonManagedReference("user-productList")
     @OneToMany(mappedBy = "user")
     private List<Product> productList;
 
-    @JsonManagedReference
+    @JsonManagedReference("user-salesOrderList")
     @OneToMany(mappedBy = "user")
     private List<SalesOrder> salesOrderList;
-
-
-
 }

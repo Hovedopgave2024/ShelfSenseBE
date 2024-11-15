@@ -21,19 +21,20 @@ public class Product
     @Column(name = "price", nullable = false)
     private double price;
 
+    @Lob
     @Column(name = "picture", nullable = true)
-    private String picture;
+    private byte[] picture;
 
-    @JsonManagedReference
+    @JsonManagedReference("product-productComponentList")
     @OneToMany(mappedBy = "product")
     private List<ProductComponent> productComponentList;
 
-    @JsonBackReference
+    @JsonBackReference("user-productList")
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonManagedReference
+    @JsonManagedReference("product-salesOrderList")
     @OneToMany(mappedBy = "product")
     private List<SalesOrder> salesOrderList;
 

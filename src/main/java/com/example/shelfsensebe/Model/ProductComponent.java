@@ -13,12 +13,12 @@ public class ProductComponent
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @JsonBackReference
+    @JsonBackReference("product-productComponentList")
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @JsonManagedReference
+    @JsonBackReference("component-productComponentList")
     @ManyToOne
     @JoinColumn(name = "component_id")
     private Component component;

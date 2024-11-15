@@ -29,12 +29,12 @@ public class SalesOrder
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
-    @JsonBackReference
+    @JsonBackReference("user-salesOrderList")
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonBackReference
+    @JsonBackReference("product-salesOrderList")
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
