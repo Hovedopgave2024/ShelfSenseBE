@@ -1,8 +1,6 @@
 package com.example.shelfsensebe.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,10 +19,6 @@ public class SalesOrder
 
     @Column(name = "price", nullable = false)
     private double price;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private OrderStatus status;
 
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
