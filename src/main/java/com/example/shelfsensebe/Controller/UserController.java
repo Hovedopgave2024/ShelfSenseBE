@@ -1,5 +1,6 @@
 package com.example.shelfsensebe.Controller;
 import com.example.shelfsensebe.Model.User;
+import com.example.shelfsensebe.Service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import com.example.shelfsensebe.Repository.UserRepository;
@@ -16,14 +17,13 @@ public class UserController
     @Autowired
     UserRepository userRepository;
 
-    @GetMapping("/users")
-    public ResponseEntity<User> getUserById(HttpSession session){
-        UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        int userId = userDTO.getId();
-        return ResponseEntity.ok(userRepository.findById(userId));
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("users/{userId}")
+    public Optional<User> getUserWithDetails(@PathVariable int userId) {
+
+        return userRepository.findById(userId);
     }
 
     @PostMapping("/users")

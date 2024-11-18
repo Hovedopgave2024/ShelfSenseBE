@@ -33,11 +33,4 @@ public class Product
     @JsonManagedReference("product-salesOrderList")
     @OneToMany(mappedBy = "product")
     private List<SalesOrder> salesOrderList;
-
-
-
-
-
-
-
 }
