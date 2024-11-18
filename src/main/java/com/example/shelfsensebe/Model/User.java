@@ -19,10 +19,6 @@ public class User
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Lob
-    @Column(name = "picture", nullable = true)
-    private byte[] picture;
-
     @JsonManagedReference("user-componentList")
     @OneToMany(mappedBy = "user")
     private List<Component> componentList;
