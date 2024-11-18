@@ -18,38 +18,46 @@ public class Component
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "price", nullable = false)
-    private double price;
-
     @Column(name = "type", nullable = false)
     private String type;
-
-    @Lob
-    @Column(name = "picture", nullable = true)
-    private byte[] picture;
-
-    @Column(name = "designator", nullable = false)
-    private String designator;
 
     @Column(name = "footprint", nullable = false)
     private String footprint;
 
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
-
-    @Column(name = "safety_stock", nullable = false)
-    private int safetyStock;
-
-    @Column(name = "manufacturer", nullable = false)
-    private String manufacturer;
-
     @Column(name = "manufacturer_part", nullable = false)
     private String manufacturerPart;
+
+    @Column(name = "price", nullable = false)
+    private double price;
 
     @Column(name = "supplier", nullable = false)
     private String supplier;
 
-    @Column(name = "supplier_part", nullable = false)
+    @Column(name = "stock", nullable = false)
+    private int stock;
+
+    @Column(name = "safety_stock", nullable = false)
+    private int safetyStock;
+
+    @Column(name ="safety_stock_rop", nullable = false)
+    private int safetyStockRop;
+
+    @Column(name = "supplier_stock")
+    private int supplierStock;
+
+    @Column(name = "supplier_safety_stock")
+    private int supplierSafetyStock;
+
+    @Column(name ="supplier_safety_stock_rop")
+    private int supplierSafetyStockRop;
+
+    @Column(name = "designator")
+    private String designator;
+
+    @Column(name = "manufacturer")
+    private String manufacturer;
+
+    @Column(name = "supplier_part")
     private String supplierPart;
 
     @JsonManagedReference("component-productComponentList")
@@ -60,5 +68,4 @@ public class Component
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
 }

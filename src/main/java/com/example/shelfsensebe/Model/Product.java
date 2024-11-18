@@ -21,10 +21,6 @@ public class Product
     @Column(name = "price", nullable = false)
     private double price;
 
-    @Lob
-    @Column(name = "picture", nullable = true)
-    private byte[] picture;
-
     @JsonManagedReference("product-productComponentList")
     @OneToMany(mappedBy = "product")
     private List<ProductComponent> productComponentList;
