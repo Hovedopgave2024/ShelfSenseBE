@@ -5,6 +5,8 @@ import com.example.shelfsensebe.Repository.ComponentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -26,5 +28,15 @@ public class ComponentController {
         }
         int userId = userDTO.getId();
         return ResponseEntity.ok(componentRepository.findByUserId(userId));
+    }
+
+    @PostMapping("/components")
+    public ResponseEntity<Component> createComponent(@RequestBody Component component) {
+        if (component.getUser() == null || component.getUser().getId() == 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Component savedComponent = componentRepository.save(component);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
     }
 }
