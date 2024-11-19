@@ -32,7 +32,7 @@ public class ComponentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         int userId = userDTO.getId();
-        return ResponseEntity.ok(componentRepository.findByUserId(userId));
+        return ResponseEntity.ok(componentRepository.findByUser_Id(userId));
     }
 
 

@@ -25,6 +25,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         int userId = userDTO.getId();
-        return ResponseEntity.ok(productRepository.findByUserId(userId));
+        return ResponseEntity.ok(productRepository.findByUser_Id(userId));
     }
 }
