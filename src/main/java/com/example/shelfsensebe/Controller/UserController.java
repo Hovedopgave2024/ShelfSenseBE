@@ -16,11 +16,21 @@ public class UserController
     @Autowired
     UserRepository userRepository;
 
+    @GetMapping("/users")
+    public ResponseEntity<User> getUserById(HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        int userId = userDTO.getId();
+        return ResponseEntity.ok(userRepository.findById(userId));
+    }
+
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         if (userRepository.findByName(user.getName()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("User with name: " + user.getName() + " already exists");
+                    .body(null);
         }
         User savedUser = userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);

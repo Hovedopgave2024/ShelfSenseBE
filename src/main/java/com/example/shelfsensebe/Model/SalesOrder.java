@@ -1,6 +1,7 @@
 package com.example.shelfsensebe.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -28,9 +29,18 @@ public class SalesOrder
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonProperty("userId")
+    public Integer getUserId() {
+        return user != null ? user.getId() : null;
+    }
+
     @JsonBackReference("product-salesOrderList")
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @JsonProperty("productId")
+    public Integer getProductId() {
+        return product != null ? product.getId() : null;
+    }
 }
