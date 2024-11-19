@@ -25,6 +25,7 @@ public class Product
     @OneToMany(mappedBy = "product")
     private List<ProductComponent> productComponentList;
 
+    @JsonIgnore
     @JsonManagedReference("product-salesOrderList")
     @OneToMany(mappedBy = "product")
     private List<SalesOrder> salesOrderList;

@@ -16,9 +16,14 @@ public class UserController
     @Autowired
     UserRepository userRepository;
 
-    @GetMapping("users/{userId}")
-    public Optional<User> getUserById(@PathVariable int userId) {
-        return userRepository.findById(userId);
+    @GetMapping("/users")
+    public ResponseEntity<User> getUserById(HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        int userId = userDTO.getId();
+        return ResponseEntity.ok(userRepository.findById(userId));
     }
 
     @PostMapping("/users")
