@@ -58,11 +58,12 @@ public class UserController
 
     // Checking if session is active
     @GetMapping("/session")
-    public ResponseEntity<String> sessionStatus(HttpSession session) {
+    public ResponseEntity<UserDTO> sessionStatus(HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok("User with id: " + userDTO.getId() + " is logged in");
+        return ResponseEntity.ok(userDTO);
     }
+
 }
