@@ -35,9 +35,4 @@ public class Product
     private List<SalesOrder> salesOrderList;
 
 
-
-
-
-
-
 }
