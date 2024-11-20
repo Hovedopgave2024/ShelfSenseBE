@@ -1,8 +1,10 @@
 package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.Model.Component;
+import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ComponentService;
+import com.example.shelfsensebe.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,9 @@ public class ComponentController {
     @Autowired
     ComponentService componentService;
 
+    @Autowired
+    UserService userService;
+
     @GetMapping("/components")
     public ResponseEntity<List<Component>> getComponents(HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
@@ -34,11 +39,13 @@ public class ComponentController {
         return ResponseEntity.ok(componentRepository.findByUser_Id(userId));
     }
 
-
     @PostMapping("/components")
     public ResponseEntity<Component> createComponent(@RequestBody Component component, HttpSession session) {
         try {
-            Component savedComponent = componentService.createComponent(component, session);
+            // Retrieve the logged-in user from the session
+            User user = userService.getCurrentUser(session);
+            // Pass the user to the service
+            Component savedComponent = componentService.createComponent(component, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

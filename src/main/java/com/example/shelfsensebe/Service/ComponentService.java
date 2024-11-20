@@ -13,16 +13,9 @@ public class ComponentService {
     @Autowired
     private ComponentRepository componentRepository;
 
-    @Autowired
-    private UserService userService;
-
-    public Component createComponent(Component component, HttpSession session) {
-        // Validate and retrieve the logged-in user
-        User user = userService.getCurrentUser(session);
-
+    public Component createComponent(Component component, User user) {
         // Associate the component with the user
         component.setUser(user);
-
         // Save the component to the database
         return componentRepository.save(component);
     }
