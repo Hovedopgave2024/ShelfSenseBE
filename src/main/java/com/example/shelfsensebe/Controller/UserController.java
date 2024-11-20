@@ -16,14 +16,13 @@ public class UserController
     @Autowired
     UserRepository userRepository;
 
-    @GetMapping("/users")
-    public ResponseEntity<User> getUserById(HttpSession session) {
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(HttpSession session, @PathVariable int id) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
+        if (userDTO == null || userDTO.getId() != id) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        int userId = userDTO.getId();
-        return ResponseEntity.ok(userRepository.findById(userId));
+        return ResponseEntity.ok(userRepository.findById(id));
     }
 
     @PostMapping("/users")
