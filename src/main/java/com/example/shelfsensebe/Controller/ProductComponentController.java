@@ -24,8 +24,7 @@ public class ProductComponentController
     ProductComponentService productComponentService;
 
     @PostMapping("/productComponents")
-    public ResponseEntity<List<ProductComponent>> addProductComponents(
-            @RequestBody List<ProductComponent> productComponents, HttpSession session) {
+    public ResponseEntity<List<ProductComponent>> addProductComponents(@RequestBody List<ProductComponent> productComponents, HttpSession session) {
 
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {

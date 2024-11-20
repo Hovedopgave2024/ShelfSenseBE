@@ -49,7 +49,7 @@ public class ProductController {
 
         // Set the ID from userDTO
         user.setId(userDTO.getId());
-        
+
         // Validate if the product name already exists for this user
         if (productRepository.existsByNameAndUser_Id(product.getName(), user.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
