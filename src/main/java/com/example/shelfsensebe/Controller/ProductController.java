@@ -44,14 +44,14 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Fetch User object from the database
-        User user = userRepository.findById(userDTO.getId()).orElse(null);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        // Create a new User instance
+        User user = new User();
 
+        // Set the ID from userDTO
+        user.setId(userDTO.getId());
+        
         // Validate if the product name already exists for this user
-        if (productRepository.existsByNameAndUserId(product.getName(), user.getId())) {
+        if (productRepository.existsByNameAndUser_Id(product.getName(), user.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 

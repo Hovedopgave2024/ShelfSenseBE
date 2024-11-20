@@ -13,6 +13,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     boolean existsByName(String name);
 
-    boolean existsByNameAndUserId(String name, int id);
+    boolean existsByNameAndUser_Id(String name, int userId);
 
 }
