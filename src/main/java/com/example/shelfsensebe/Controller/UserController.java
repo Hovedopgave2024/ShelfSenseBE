@@ -16,11 +16,20 @@ public class UserController
     @Autowired
     UserRepository userRepository;
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(HttpSession session, @PathVariable int id) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null || userDTO.getId() != id) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(userRepository.findById(id));
+    }
+
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         if (userRepository.findByName(user.getName()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("User with name: " + user.getName() + " already exists");
+                    .body(null);
         }
         User savedUser = userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
@@ -48,11 +57,12 @@ public class UserController
 
     // Checking if session is active
     @GetMapping("/session")
-    public ResponseEntity<String> sessionStatus(HttpSession session) {
+    public ResponseEntity<UserDTO> sessionStatus(HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok("User with id: " + userDTO.getId() + " is logged in");
+        return ResponseEntity.ok(userDTO);
     }
+
 }
