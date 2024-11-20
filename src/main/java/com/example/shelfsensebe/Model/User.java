@@ -30,4 +30,5 @@ public class User
     @JsonManagedReference("user-salesOrderList")
     @OneToMany(mappedBy = "user")
     private List<SalesOrder> salesOrderList;
+
 }
