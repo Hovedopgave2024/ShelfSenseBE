@@ -41,15 +41,21 @@ public class ComponentController {
 
     @PostMapping("/components")
     public ResponseEntity<Component> createComponent(@RequestBody Component component, HttpSession session) {
-        try {
-            // Retrieve the logged-in user from the session
-            User user = userService.getCurrentUser(session);
-            // Pass the user to the service
-            Component savedComponent = componentService.createComponent(component, user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        // Validate the user session
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 Unauthorized
         }
+        // Associate the logged-in user with the component
+        User userEntity = new User();
+        userEntity.setId(user.getId());
+        component.setUser(userEntity);
+        // Save the component in the database
+        Component savedComponent = componentRepository.save(component);
+        // Return the saved component
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
     }
+
+
 
 }
