@@ -41,20 +41,14 @@ public class ComponentController {
 
     @PostMapping("/components")
     public ResponseEntity<Component> createComponent(@RequestBody Component component, HttpSession session) {
-        // Validate the user session
-        UserDTO user = (UserDTO) session.getAttribute("user");
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 Unauthorized
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        // Associate the logged-in user with the component
-        User userEntity = new User();
-        userEntity.setId(user.getId());
-        component.setUser(userEntity);
-        // Save the component in the database
-        Component savedComponent = componentRepository.save(component);
-        // Return the saved component
+        Component savedComponent = componentService.createComponent(component, userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
     }
+
 
 
 
