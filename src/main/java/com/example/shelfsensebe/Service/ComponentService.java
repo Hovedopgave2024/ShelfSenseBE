@@ -29,11 +29,6 @@ public class ComponentService
             new IllegalArgumentException("Component Not Found")
         );
 
-        // If the user ID associated with the component does not match the logged-in user's ID, throw a SecurityException.
-        if (existingComponent.getUserId() != userDTO.getId()) {
-            throw new SecurityException("Unauthorized to update this component");
-        }
-
         existingComponent.setName(updatedComponent.getName());
         existingComponent.setType(updatedComponent.getType());
         existingComponent.setFootprint(updatedComponent.getFootprint());
@@ -50,5 +45,14 @@ public class ComponentService
         existingComponent.setSupplierPart(updatedComponent.getSupplierPart());
 
         return componentRepository.save(existingComponent);
+    }
+
+    public void deleteComponent(int id) {
+        // Find the component by ID
+        Component component = componentRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Component not found")
+        );
+        // Delete the component
+        componentRepository.delete(component);
     }
 }

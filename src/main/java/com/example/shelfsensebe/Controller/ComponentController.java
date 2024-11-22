@@ -56,4 +56,14 @@ public class ComponentController {
         return ResponseEntity.ok(savedComponent);
     }
 
+    @DeleteMapping("/components/{id}")
+    public ResponseEntity<Void> deleteComponent(@PathVariable int id, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        componentService.deleteComponent(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
