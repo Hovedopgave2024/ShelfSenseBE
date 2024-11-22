@@ -19,6 +19,7 @@ import com.example.shelfsensebe.DTO.UserDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ComponentController {
@@ -52,12 +53,10 @@ public class ComponentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
     }
 
-    @PostMapping("/suppliers")
-    public ResponseEntity<SupplierDTO> createSupplier(@RequestBody SupplierDTO supplierDTO) {
-        List<Component> components = componentRepository.getAll();
-        List<SupplierDTO> supplierDTOs = new ArrayList<>();
-
-        return List<SupplierDTO>
+    @PostMapping("/components/mouser")
+    public ResponseEntity<Map<String, Object>> fetchAllComponentData() {
+        Map<String, Object> data = componentService.fetchAllComponentData();
+        return ResponseEntity.ok(data);
     }
 
 

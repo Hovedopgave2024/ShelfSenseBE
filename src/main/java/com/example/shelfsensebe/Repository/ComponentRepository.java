@@ -10,5 +10,4 @@ import java.util.List;
 public interface ComponentRepository extends JpaRepository<Component, Integer> {
 
     List<Component> findByUser_Id(int userId);
-    List<Component>getAll();
 }

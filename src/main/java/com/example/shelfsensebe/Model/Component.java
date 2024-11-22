@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Date;
 import java.util.List;
 
 @Entity
@@ -57,7 +58,7 @@ public class Component
     private int supplierIncomingStock;
 
     @Column(name = "supplier_incoming_date")
-    private int supplierIncomingDate;
+    private Date supplierIncomingDate;
 
     @Column(name = "designator")
     private String designator;
