@@ -39,7 +39,7 @@ public class ComponentService
         // Fetch all components from the repository
         List<Component> components = componentRepository.findAll();
 
-        // Aggregate API responses
+        // Aggregate cleaned API responses
         Map<String, Object> aggregatedResponses = new HashMap<>();
 
         // Fetch data for each component
@@ -66,10 +66,38 @@ public class ComponentService
                     .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                     .block(); // Blocking call for simplicity
 
-            aggregatedResponses.put(component.getManufacturerPart(), apiResponse);
+            // Extract only the required fields
+            Map<String, Object> cleanedResponse = extractRequiredFields(apiResponse);
+
+            // Save the cleaned response
+            if (cleanedResponse != null) {
+                aggregatedResponses.put(component.getManufacturerPart(), cleanedResponse);
+            }
         });
 
         return aggregatedResponses;
+    }
+
+    /**
+     * Extracts only "AvailabilityInStock" and "AvailabilityOnOrder" from the API response.
+     */
+    private Map<String, Object> extractRequiredFields(Map<String, Object> apiResponse) {
+        Map<String, Object> cleanedData = new HashMap<>();
+
+        // Navigate the API response structure
+        Map<String, Object> searchResults = (Map<String, Object>) apiResponse.get("SearchResults");
+        if (searchResults != null) {
+            List<Map<String, Object>> parts = (List<Map<String, Object>>) searchResults.get("Parts");
+            if (parts != null && !parts.isEmpty()) {
+                Map<String, Object> part = parts.get(0); // Assuming only one part is returned
+
+                // Extract fields of interest
+                cleanedData.put("AvailabilityInStock", part.get("AvailabilityInStock"));
+                cleanedData.put("AvailabilityOnOrder", part.get("AvailabilityOnOrder"));
+            }
+        }
+
+        return cleanedData.isEmpty() ? null : cleanedData;
     }
 
 }
