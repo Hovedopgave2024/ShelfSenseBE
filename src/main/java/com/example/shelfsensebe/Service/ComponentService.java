@@ -1,5 +1,6 @@
 package com.example.shelfsensebe.Service;
 
+import com.example.shelfsensebe.DTO.ComponentSupplierDTO;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
@@ -37,8 +38,8 @@ public class ComponentService
 
     public Map<String, Object> fetchAllComponentData() {
         // Fetch all components from the repository
-        List<Component> components = componentRepository.findAll();
-
+        List<ComponentSupplierDTO> components = componentRepository.findBySupplier("Mouser");
+        
         // Aggregate cleaned API responses
         Map<String, Object> aggregatedResponses = new HashMap<>();
 

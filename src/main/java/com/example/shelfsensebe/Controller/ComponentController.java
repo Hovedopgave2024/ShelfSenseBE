@@ -1,9 +1,6 @@
 package com.example.shelfsensebe.Controller;
 
-import com.example.shelfsensebe.DTO.SupplierDTO;
 import com.example.shelfsensebe.Model.Component;
-import com.example.shelfsensebe.Model.ProductComponent;
-import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ComponentService;
 import com.example.shelfsensebe.Service.UserService;
@@ -17,7 +14,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import com.example.shelfsensebe.DTO.UserDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

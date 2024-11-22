@@ -5,17 +5,19 @@ import lombok.Data;
 import java.sql.Date;
 
 @Data
-public class SupplierDTO {
+public class ComponentSupplierDTO {
     private int id;
     private int supplierStock;
-    private int supplierSafetyStock;
+    private String manufacturer;
+    private String manufacturerPart;
     private int supplierIncomingStock;
     private Date supplierIncomingDate;
 
-    public SupplierDTO(int id, int supplierStock, int supplierSafetyStock, int supplierIncomingStock, Date supplierIncomingDate) {
+    public ComponentSupplierDTO(int id, int supplierStock, String manufacturer, String manufacturerPart, int supplierIncomingStock, Date supplierIncomingDate) {
         this.id = id;
         this.supplierStock = supplierStock;
-        this.supplierSafetyStock = supplierSafetyStock;
+        this.manufacturer = manufacturer;
+        this.manufacturerPart = manufacturerPart;
         this.supplierIncomingStock = supplierIncomingStock;
         this.supplierIncomingDate = supplierIncomingDate;
     }
