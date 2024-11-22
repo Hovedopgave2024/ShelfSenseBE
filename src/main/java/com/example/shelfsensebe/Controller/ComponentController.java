@@ -1,6 +1,8 @@
 package com.example.shelfsensebe.Controller;
 
+import com.example.shelfsensebe.DTO.SupplierDTO;
 import com.example.shelfsensebe.Model.Component;
+import com.example.shelfsensebe.Model.ProductComponent;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ComponentService;
@@ -15,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import com.example.shelfsensebe.DTO.UserDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -49,7 +52,13 @@ public class ComponentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
     }
 
+    @PostMapping("/suppliers")
+    public ResponseEntity<SupplierDTO> createSupplier(@RequestBody SupplierDTO supplierDTO) {
+        List<Component> components = componentRepository.getAll();
+        List<SupplierDTO> supplierDTOs = new ArrayList<>();
 
+        return List<SupplierDTO>
+    }
 
 
 }
