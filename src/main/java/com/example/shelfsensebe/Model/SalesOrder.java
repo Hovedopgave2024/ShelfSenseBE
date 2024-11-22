@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.sql.Date;
+
 
 @Entity
 @Data
@@ -22,7 +23,7 @@ public class SalesOrder
     private double price;
 
     @Column(name = "created_date", nullable = false)
-    private LocalDateTime createdDate;
+    private Date createdDate;
 
     @JsonBackReference("user-salesOrderList")
     @ManyToOne

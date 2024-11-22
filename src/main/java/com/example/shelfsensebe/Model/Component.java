@@ -41,7 +41,7 @@ public class Component
     @Column(name = "safety_stock", nullable = false)
     private int safetyStock;
 
-    @Column(name ="safety_stock_rop", nullable = false)
+    @Column(name = "safety_stock_rop", nullable = false)
     private int safetyStockRop;
 
     @Column(name = "supplier_stock")
@@ -50,8 +50,14 @@ public class Component
     @Column(name = "supplier_safety_stock")
     private int supplierSafetyStock;
 
-    @Column(name ="supplier_safety_stock_rop")
+    @Column(name = "supplier_safety_stock_rop")
     private int supplierSafetyStockRop;
+
+    @Column(name = "supplier_incoming_stock")
+    private int supplierIncomingStock;
+
+    @Column(name = "supplier_incoming_date")
+    private int supplierIncomingDate;
 
     @Column(name = "designator")
     private String designator;
