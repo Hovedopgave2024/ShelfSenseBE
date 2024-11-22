@@ -11,6 +11,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,13 +93,44 @@ public class ComponentService
             if (parts != null && !parts.isEmpty()) {
                 Map<String, Object> part = parts.get(0); // Assuming only one part is returned
 
-                // Extract fields of interest
-                cleanedData.put("AvailabilityInStock", part.get("AvailabilityInStock"));
-                cleanedData.put("AvailabilityOnOrder", part.get("AvailabilityOnOrder"));
+                // Extract AvailabilityInStock
+                if (part.containsKey("AvailabilityInStock")) {
+                    cleanedData.put("AvailabilityInStock", Integer.parseInt(part.get("AvailabilityInStock").toString()));
+                }
+
+                // Extract AvailabilityOnOrder fields
+                if (part.containsKey("AvailabilityOnOrder")) {
+                    List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");
+                    if (!availabilityOnOrder.isEmpty()) {
+                        Map<String, Object> firstOrder = availabilityOnOrder.get(0);
+
+                        // Extract Quantity
+                        if (firstOrder.containsKey("Quantity")) {
+                            cleanedData.put("AvailabilityOnOrderQuantity", Integer.parseInt(firstOrder.get("Quantity").toString()));
+                        }
+
+                        // Extract Date
+                        if (firstOrder.containsKey("Date")) {
+                            cleanedData.put("AvailabilityOnOrderDate", firstOrder.get("Date").toString().split("T")[0]); // Format date as yyyy-MM-dd
+                        }
+                    }
+                }
             }
         }
 
         return cleanedData.isEmpty() ? null : cleanedData;
+    }
+
+    public ComponentSupplierDTO updateComponentSupplierDTO(ComponentSupplierDTO dto, Map<String, Object> cleanedData) {
+        if (cleanedData == null) {
+            return dto;
+        }
+
+        dto.setSupplierStock((int) cleanedData.get("AvailabilityInStock"));
+        dto.setSupplierIncomingStock((int) cleanedData.get("AvailabilityOnOrderQuantity"));
+        dto.setSupplierIncomingDate(Date.valueOf(cleanedData.get("AvailabilityOnOrderDate").toString()));
+
+        return dto;
     }
 
 }
