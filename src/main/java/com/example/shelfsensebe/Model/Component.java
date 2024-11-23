@@ -46,16 +46,16 @@ public class Component
     private int safetyStockRop;
 
     @Column(name = "supplier_stock")
-    private int supplierStock;
+    private Integer supplierStock;
 
     @Column(name = "supplier_safety_stock")
-    private int supplierSafetyStock;
+    private Integer supplierSafetyStock;
 
     @Column(name = "supplier_safety_stock_rop")
-    private int supplierSafetyStockRop;
+    private Integer supplierSafetyStockRop;
 
     @Column(name = "supplier_incoming_stock")
-    private int supplierIncomingStock;
+    private Integer supplierIncomingStock;
 
     @Column(name = "supplier_incoming_date")
     private Date supplierIncomingDate;

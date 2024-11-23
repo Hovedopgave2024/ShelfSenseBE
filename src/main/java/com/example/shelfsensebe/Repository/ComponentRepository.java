@@ -14,6 +14,7 @@ public interface ComponentRepository extends JpaRepository<Component, Integer> {
 
     List<Component> findByUser_Id(int userId);
 
-    @Query("SELECT new com.example.shelfsensebe.DTO.ComponentSupplierDTO(c.id, c.supplierStock, c.manufacturer, c.manufacturerPart, c.supplierIncomingStock, c.supplierIncomingDate) FROM Component c WHERE c.supplier = :supplier")
+    @Query("SELECT new com.example.shelfsensebe.DTO.ComponentSupplierDTO(c.id, c.supplierStock, c.manufacturer, c.manufacturerPart, c.supplierIncomingStock, c.supplierIncomingDate) " +
+            "FROM Component c WHERE c.supplier = :supplier")
     List<ComponentSupplierDTO> findBySupplier(@Param("supplier") String supplier);
 }

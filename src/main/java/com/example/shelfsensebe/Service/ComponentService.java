@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class ComponentService
@@ -37,16 +38,21 @@ public class ComponentService
         return componentRepository.save(component);
     }
 
-    public Map<String, Object> fetchAllComponentData() {
-        // Fetch all components from the repository
+    public void fetchAndUpdateComponentData() {
+        // Fetch components as DTOs
         List<ComponentSupplierDTO> components = componentRepository.findBySupplier("Mouser");
-        
-        // Aggregate cleaned API responses
-        Map<String, Object> aggregatedResponses = new HashMap<>();
 
-        // Fetch data for each component
+        // Prepare a map for API responses
+        Map<String, Map<String, Object>> aggregatedResponses = fetchAllComponentData(components);
+
+        // Update components with the cleaned data
+        updateComponentsWithFetchedData(components, aggregatedResponses);
+    }
+
+    public Map<String, Map<String, Object>> fetchAllComponentData(List<ComponentSupplierDTO> components) {
+        Map<String, Map<String, Object>> aggregatedResponses = new HashMap<>();
+
         components.forEach(component -> {
-            // Build the POST request body
             Map<String, Object> requestBody = Map.of(
                     "SearchByKeywordMfrNameRequest", Map.of(
                             "manufacturerName", component.getManufacturer(),
@@ -58,7 +64,6 @@ public class ComponentService
                     )
             );
 
-            // Make the API call
             Map<String, Object> apiResponse = webClient.post()
                     .uri(uriBuilder -> uriBuilder.path("/search/keywordandmanufacturer")
                             .queryParam("apiKey", apiKey)
@@ -66,12 +71,10 @@ public class ComponentService
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-                    .block(); // Blocking call for simplicity
+                    .block();
 
-            // Extract only the required fields
             Map<String, Object> cleanedResponse = extractRequiredFields(apiResponse);
 
-            // Save the cleaned response
             if (cleanedResponse != null) {
                 aggregatedResponses.put(component.getManufacturerPart(), cleanedResponse);
             }
@@ -80,39 +83,34 @@ public class ComponentService
         return aggregatedResponses;
     }
 
-    /**
-     * Extracts only "AvailabilityInStock" and "AvailabilityOnOrder" from the API response.
-     */
     private Map<String, Object> extractRequiredFields(Map<String, Object> apiResponse) {
         Map<String, Object> cleanedData = new HashMap<>();
 
-        // Navigate the API response structure
         Map<String, Object> searchResults = (Map<String, Object>) apiResponse.get("SearchResults");
         if (searchResults != null) {
             List<Map<String, Object>> parts = (List<Map<String, Object>>) searchResults.get("Parts");
             if (parts != null && !parts.isEmpty()) {
-                Map<String, Object> part = parts.get(0); // Assuming only one part is returned
+                Map<String, Object> part = parts.get(0);
 
-                // Extract AvailabilityInStock
-                if (part.containsKey("AvailabilityInStock")) {
-                    cleanedData.put("AvailabilityInStock", Integer.parseInt(part.get("AvailabilityInStock").toString()));
+                // Parse AvailabilityInStock safely
+                Object inStock = part.get("AvailabilityInStock");
+                if (inStock != null) {
+                    cleanedData.put("AvailabilityInStock", Integer.parseInt(inStock.toString()));
                 }
 
-                // Extract AvailabilityOnOrder fields
-                if (part.containsKey("AvailabilityOnOrder")) {
-                    List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");
-                    if (!availabilityOnOrder.isEmpty()) {
-                        Map<String, Object> firstOrder = availabilityOnOrder.get(0);
+                // Parse AvailabilityOnOrder safely
+                List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");
+                if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
+                    Map<String, Object> firstOrder = availabilityOnOrder.get(0);
 
-                        // Extract Quantity
-                        if (firstOrder.containsKey("Quantity")) {
-                            cleanedData.put("AvailabilityOnOrderQuantity", Integer.parseInt(firstOrder.get("Quantity").toString()));
-                        }
+                    Object quantity = firstOrder.get("Quantity");
+                    if (quantity != null) {
+                        cleanedData.put("AvailabilityOnOrderQuantity", Integer.parseInt(quantity.toString()));
+                    }
 
-                        // Extract Date
-                        if (firstOrder.containsKey("Date")) {
-                            cleanedData.put("AvailabilityOnOrderDate", firstOrder.get("Date").toString().split("T")[0]); // Format date as yyyy-MM-dd
-                        }
+                    Object date = firstOrder.get("Date");
+                    if (date != null) {
+                        cleanedData.put("AvailabilityOnOrderDate", date.toString().split("T")[0]);
                     }
                 }
             }
@@ -121,16 +119,29 @@ public class ComponentService
         return cleanedData.isEmpty() ? null : cleanedData;
     }
 
-    public ComponentSupplierDTO updateComponentSupplierDTO(ComponentSupplierDTO dto, Map<String, Object> cleanedData) {
-        if (cleanedData == null) {
-            return dto;
-        }
+    private void updateComponentsWithFetchedData(List<ComponentSupplierDTO> components, Map<String, Map<String, Object>> aggregatedResponses) {
+        components.forEach(component -> {
+            Map<String, Object> cleanedData = aggregatedResponses.get(component.getManufacturerPart());
 
-        dto.setSupplierStock((int) cleanedData.get("AvailabilityInStock"));
-        dto.setSupplierIncomingStock((int) cleanedData.get("AvailabilityOnOrderQuantity"));
-        dto.setSupplierIncomingDate(Date.valueOf(cleanedData.get("AvailabilityOnOrderDate").toString()));
+            // Load the full entity from the database
+            Component entity = componentRepository.findById(component.getId())
+                    .orElseThrow(() -> new RuntimeException("Component not found"));
 
-        return dto;
+            if (cleanedData != null) {
+                Integer supplierStock = (Integer) cleanedData.get("AvailabilityInStock");
+                Integer supplierIncomingStock = (Integer) cleanedData.get("AvailabilityOnOrderQuantity");
+                String supplierIncomingDate = (String) cleanedData.get("AvailabilityOnOrderDate");
+
+                entity.setSupplierStock(supplierStock);
+                entity.setSupplierIncomingStock(supplierIncomingStock);
+                entity.setSupplierIncomingDate(supplierIncomingDate != null ? Date.valueOf(supplierIncomingDate) : null);
+            } else {
+                entity.setSupplierStock(null);
+                entity.setSupplierIncomingStock(null);
+                entity.setSupplierIncomingDate(null);
+            }
+
+            componentRepository.save(entity);
+        });
     }
-
 }

@@ -3,7 +3,6 @@ package com.example.shelfsensebe.Controller;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ComponentService;
-import com.example.shelfsensebe.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +25,6 @@ public class ComponentController {
     @Autowired
     ComponentService componentService;
 
-    @Autowired
-    UserService userService;
-
     @GetMapping("/components")
     public ResponseEntity<List<Component>> getComponents(HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
@@ -49,10 +45,19 @@ public class ComponentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
     }
 
-    @PostMapping("/components/mouser")
-    public ResponseEntity<Map<String, Object>> fetchAllComponentData() {
-        Map<String, Object> data = componentService.fetchAllComponentData();
-        return ResponseEntity.ok(data);
+    @PostMapping("components/mouser")
+    public ResponseEntity<Map<String, String>> fetchAndUpdateComponentData() {
+        try {
+            componentService.fetchAndUpdateComponentData();
+            Map<String, String> response = Map.of("status", "success", "message", "Data fetched and updated successfully");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, String> errorResponse = Map.of("status", "error", "message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = Map.of("status", "error", "message", "An unexpected error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
 
