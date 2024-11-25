@@ -1,5 +1,6 @@
 package com.example.shelfsensebe.Controller;
 
+import com.example.shelfsensebe.DTO.ComponentSupplierDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ComponentService;
@@ -43,26 +44,13 @@ public class ComponentController {
     }
 
     @PostMapping("components/mouser")
-    public ResponseEntity<Map<String, String>> fetchAndUpdateComponentData() {
+    public ResponseEntity<List<ComponentSupplierDTO>> fetchAndUpdateComponentData() {
         try {
-            componentService.realFunction();
-            Map<String, String> response = Map.of(
-                    "status", "success",
-                    "message", "Data fetched and updated successfully"
-            );
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            Map<String, String> errorResponse = Map.of(
-                    "status", "error",
-                    "message", e.getMessage()
-            );
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            List<ComponentSupplierDTO> updatedComponents = componentService.fetchAndUpdateComponentWithSupplierInfo();
+            System.out.println(updatedComponents);
+            return ResponseEntity.ok(updatedComponents);
         } catch (Exception e) {
-            Map<String, String> errorResponse = Map.of(
-                    "status", "error",
-                    "message", "An unexpected error occurred"
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
