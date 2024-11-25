@@ -2,6 +2,7 @@ package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.DTO.ComponentSupplierDTO;
 import com.example.shelfsensebe.Model.Component;
+import com.example.shelfsensebe.Repository.ApiUpdateRepository;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class ComponentController {
         try {
             List<ComponentSupplierDTO> updatedComponents = componentService.fetchAndUpdateComponentWithSupplierInfo(apiKey, userDTO.getId());
             System.out.println(updatedComponents);
+            
             return ResponseEntity.ok(updatedComponents);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

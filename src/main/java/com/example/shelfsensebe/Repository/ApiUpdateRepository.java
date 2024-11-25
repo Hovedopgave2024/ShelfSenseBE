@@ -1,4 +1,7 @@
 package com.example.shelfsensebe.Repository;
 
-public class ApiUpdateRepository {
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ApiUpdateRepository {
 }
