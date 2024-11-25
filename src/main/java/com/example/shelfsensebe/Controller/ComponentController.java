@@ -44,9 +44,15 @@ public class ComponentController {
     }
 
     @PostMapping("components/mouser")
-    public ResponseEntity<List<ComponentSupplierDTO>> fetchAndUpdateComponentData() {
+    public ResponseEntity<List<ComponentSupplierDTO>> fetchAndUpdateComponentData(@RequestBody Map<String, String> requestBody, HttpSession session) {
+        int userId = Integer.parseInt(requestBody.get("userId"));
+        String apiKey = requestBody.get("apiKey");
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null || userDTO.getId() != userId) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         try {
-            List<ComponentSupplierDTO> updatedComponents = componentService.fetchAndUpdateComponentWithSupplierInfo();
+            List<ComponentSupplierDTO> updatedComponents = componentService.fetchAndUpdateComponentWithSupplierInfo(apiKey, userDTO.getId());
             System.out.println(updatedComponents);
             return ResponseEntity.ok(updatedComponents);
         } catch (Exception e) {

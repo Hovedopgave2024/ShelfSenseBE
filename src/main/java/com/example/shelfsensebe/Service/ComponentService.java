@@ -26,9 +26,6 @@ public class ComponentService
     @Autowired
     private WebClient webClient;
 
-    @Value("${api.mouser.key}")
-    private String apiKey;
-
     public Component createComponent(Component component, UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
@@ -37,9 +34,9 @@ public class ComponentService
     }
 
 
-    public List<ComponentSupplierDTO> fetchAndUpdateComponentWithSupplierInfo() {
+    public List<ComponentSupplierDTO> fetchAndUpdateComponentWithSupplierInfo(String apiKey, int userId) {
         // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
-        List<ComponentSupplierDTO> components = componentRepository.findBySupplier("Mouser");
+        List<ComponentSupplierDTO> components = componentRepository.findBySupplierAndUser("Mouser", userId);
         List<ComponentSupplierDTO> updatedComponents = new ArrayList<>();
 
         components.forEach(component -> {
