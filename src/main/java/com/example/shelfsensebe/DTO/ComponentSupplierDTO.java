@@ -7,13 +7,13 @@ import java.sql.Date;
 @Data
 public class ComponentSupplierDTO {
     private int id;
-    private int supplierStock;
+    private Integer supplierStock;
     private String manufacturer;
     private String manufacturerPart;
-    private int supplierIncomingStock;
+    private Integer supplierIncomingStock;
     private Date supplierIncomingDate;
 
-    public ComponentSupplierDTO(int id, int supplierStock, String manufacturer, String manufacturerPart, int supplierIncomingStock, Date supplierIncomingDate) {
+    public ComponentSupplierDTO(int id, Integer supplierStock, String manufacturer, String manufacturerPart, Integer supplierIncomingStock, Date supplierIncomingDate) {
         this.id = id;
         this.supplierStock = supplierStock;
         this.manufacturer = manufacturer;
