@@ -71,7 +71,8 @@ public class ComponentService
                     Map<String, Object> part = parts.get(0);
 
                     Object inStock = part.get("AvailabilityInStock");
-                    if (inStock != null) {
+                    int stockValue = Integer.parseInt(inStock.toString());
+                    if (stockValue > 0) {
                         component.setSupplierStock(Integer.parseInt(inStock.toString()));
                     } else component.setSupplierStock(null);
 
@@ -86,6 +87,9 @@ public class ComponentService
                         if (date != null) {
                             component.setSupplierIncomingDate(Date.valueOf(date.toString().split("T")[0]));
                         } else component.setSupplierIncomingDate(null);
+                    } else {
+                        component.setSupplierIncomingDate(null);
+                        component.setSupplierIncomingStock(null);
                     }
                 }
             }
