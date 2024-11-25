@@ -12,10 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.sql.Date;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class ComponentService
@@ -36,17 +35,14 @@ public class ComponentService
         return componentRepository.save(component);
     }
 
-    public void fetchAndUpdateComponentData() {
-        List<ComponentSupplierDTO> components = componentRepository.findBySupplier("Mouser");
-        System.out.println(components);
-        Map<String, Map<String, Object>> aggregatedResponses = fetchAllComponentData(components);
-        System.out.println(aggregatedResponses);
-        updateComponentsWithFetchedData(components, aggregatedResponses);
-    }
 
-    public Map<String, Map<String, Object>> fetchAllComponentData(List<ComponentSupplierDTO> components) {
-        Map<String, Map<String, Object>> aggregatedResponses = new HashMap<>();
+    public void realFunction() {
+        // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
+        List<ComponentSupplierDTO> components = componentRepository.findBySupplier("Mouser");
+        List<ComponentSupplierDTO> updatedComponents = new ArrayList<>();
+
         components.forEach(component -> {
+            // mouser API request:
             Map<String, Object> requestBody = Map.of(
                     "SearchByKeywordMfrNameRequest", Map.of(
                             "manufacturerName", component.getManufacturer(),
@@ -66,73 +62,37 @@ public class ComponentService
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                     .block();
+            Map<String, Object> searchResults = (Map<String, Object>) apiResponse.get("SearchResults");
 
-            Map<String, Object> cleanedResponse = extractRequiredFields(apiResponse);
+            // Clean the response to handle null errors and find the necessary info.
+            if (searchResults != null) {
+                List<Map<String, Object>> parts = (List<Map<String, Object>>) searchResults.get("Parts");
+                if (parts != null && !parts.isEmpty()) {
+                    Map<String, Object> part = parts.get(0);
 
-            if (cleanedResponse != null) {
-                aggregatedResponses.put(component.getManufacturerPart(), cleanedResponse);
-            }
-        });
+                    Object inStock = part.get("AvailabilityInStock");
+                    if (inStock != null) {
+                        component.setSupplierStock(Integer.parseInt(inStock.toString()));
+                    } else component.setSupplierStock(null);
 
-        return aggregatedResponses;
-    }
-
-    private Map<String, Object> extractRequiredFields(Map<String, Object> apiResponse) {
-        Map<String, Object> cleanedData = new HashMap<>();
-
-        Map<String, Object> searchResults = (Map<String, Object>) apiResponse.get("SearchResults");
-        if (searchResults != null) {
-            List<Map<String, Object>> parts = (List<Map<String, Object>>) searchResults.get("Parts");
-            if (parts != null && !parts.isEmpty()) {
-                Map<String, Object> part = parts.get(0);
-
-                Object inStock = part.get("AvailabilityInStock");
-                if (inStock != null) {
-                    cleanedData.put("AvailabilityInStock", Integer.parseInt(inStock.toString()));
-                }
-
-                List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");
-                if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
-                    Map<String, Object> firstOrder = availabilityOnOrder.get(0);
-
-                    Object quantity = firstOrder.get("Quantity");
-                    if (quantity != null) {
-                        cleanedData.put("AvailabilityOnOrderQuantity", Integer.parseInt(quantity.toString()));
-                    }
-
-                    Object date = firstOrder.get("Date");
-                    if (date != null) {
-                        cleanedData.put("AvailabilityOnOrderDate", date.toString().split("T")[0]);
+                    List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");
+                    if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
+                        Map<String, Object> firstOrder = availabilityOnOrder.get(0);
+                        Object quantity = firstOrder.get("Quantity");
+                        if (quantity != null) {
+                            component.setSupplierIncomingStock(Integer.parseInt(quantity.toString()));
+                        } else component.setSupplierIncomingStock(null);
+                        Object date = firstOrder.get("Date");
+                        if (date != null) {
+                            component.setSupplierIncomingDate(Date.valueOf(date.toString().split("T")[0]));
+                        } else component.setSupplierIncomingDate(null);
                     }
                 }
             }
-        }
 
-        return cleanedData.isEmpty() ? null : cleanedData;
-    }
+            updatedComponents.add(component);
 
-    private void updateComponentsWithFetchedData(List<ComponentSupplierDTO> components, Map<String, Map<String, Object>> aggregatedResponses) {
-        components.forEach(component -> {
-            Map<String, Object> cleanedData = aggregatedResponses.get(component.getManufacturerPart());
-
-            Component entity = componentRepository.findById(component.getId())
-                    .orElseThrow(() -> new RuntimeException("Component not found"));
-
-            if (cleanedData != null) {
-                Integer supplierStock = (Integer) cleanedData.get("AvailabilityInStock");
-                Integer supplierIncomingStock = (Integer) cleanedData.get("AvailabilityOnOrderQuantity");
-                String supplierIncomingDate = (String) cleanedData.get("AvailabilityOnOrderDate");
-
-                entity.setSupplierStock(supplierStock);
-                entity.setSupplierIncomingStock(supplierIncomingStock);
-                entity.setSupplierIncomingDate(supplierIncomingDate != null ? Date.valueOf(supplierIncomingDate) : null);
-            } else {
-                entity.setSupplierStock(null);
-                entity.setSupplierIncomingStock(null);
-                entity.setSupplierIncomingDate(null);
-            }
-
-            componentRepository.save(entity);
+            componentRepository.updateComponentData(component.getId(), component.getSupplierStock(), component.getSupplierIncomingStock(), component.getSupplierIncomingDate());
         });
     }
 }

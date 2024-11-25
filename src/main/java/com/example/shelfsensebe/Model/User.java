@@ -31,4 +31,7 @@ public class User
     @OneToMany(mappedBy = "user")
     private List<SalesOrder> salesOrderList;
 
+    @OneToOne(mappedBy = "user")
+    private ApiUpdate apiUpdate;
+
 }

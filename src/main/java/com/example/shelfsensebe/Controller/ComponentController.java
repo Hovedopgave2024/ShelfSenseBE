@@ -45,14 +45,23 @@ public class ComponentController {
     @PostMapping("components/mouser")
     public ResponseEntity<Map<String, String>> fetchAndUpdateComponentData() {
         try {
-            componentService.fetchAndUpdateComponentData();
-            Map<String, String> response = Map.of("status", "success", "message", "Data fetched and updated successfully");
+            componentService.realFunction();
+            Map<String, String> response = Map.of(
+                    "status", "success",
+                    "message", "Data fetched and updated successfully"
+            );
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            Map<String, String> errorResponse = Map.of("status", "error", "message", e.getMessage());
+            Map<String, String> errorResponse = Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } catch (Exception e) {
-            Map<String, String> errorResponse = Map.of("status", "error", "message", "An unexpected error occurred");
+            Map<String, String> errorResponse = Map.of(
+                    "status", "error",
+                    "message", "An unexpected error occurred"
+            );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
