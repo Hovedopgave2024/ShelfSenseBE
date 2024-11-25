@@ -30,28 +30,22 @@ public class ComponentService
     private String apiKey;
 
     public Component createComponent(Component component, UserDTO userDTO) {
-        // Map UserDTO to User
         User user = new User();
         user.setId(userDTO.getId());
         component.setUser(user);
-        // Save and return the component
         return componentRepository.save(component);
     }
 
     public void fetchAndUpdateComponentData() {
-        // Fetch components as DTOs
         List<ComponentSupplierDTO> components = componentRepository.findBySupplier("Mouser");
-
-        // Prepare a map for API responses
+        System.out.println(components);
         Map<String, Map<String, Object>> aggregatedResponses = fetchAllComponentData(components);
-
-        // Update components with the cleaned data
+        System.out.println(aggregatedResponses);
         updateComponentsWithFetchedData(components, aggregatedResponses);
     }
 
     public Map<String, Map<String, Object>> fetchAllComponentData(List<ComponentSupplierDTO> components) {
         Map<String, Map<String, Object>> aggregatedResponses = new HashMap<>();
-
         components.forEach(component -> {
             Map<String, Object> requestBody = Map.of(
                     "SearchByKeywordMfrNameRequest", Map.of(
@@ -92,13 +86,11 @@ public class ComponentService
             if (parts != null && !parts.isEmpty()) {
                 Map<String, Object> part = parts.get(0);
 
-                // Parse AvailabilityInStock safely
                 Object inStock = part.get("AvailabilityInStock");
                 if (inStock != null) {
                     cleanedData.put("AvailabilityInStock", Integer.parseInt(inStock.toString()));
                 }
 
-                // Parse AvailabilityOnOrder safely
                 List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");
                 if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
                     Map<String, Object> firstOrder = availabilityOnOrder.get(0);
@@ -123,7 +115,6 @@ public class ComponentService
         components.forEach(component -> {
             Map<String, Object> cleanedData = aggregatedResponses.get(component.getManufacturerPart());
 
-            // Load the full entity from the database
             Component entity = componentRepository.findById(component.getId())
                     .orElseThrow(() -> new RuntimeException("Component not found"));
 
