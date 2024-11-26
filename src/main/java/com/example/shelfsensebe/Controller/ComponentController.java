@@ -62,8 +62,13 @@ public class ComponentController {
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        componentService.deleteComponent(id);
-        return ResponseEntity.noContent().build();
+        try {
+            componentService.deleteComponent(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // 409 Conflict
+        }
     }
+
 
 }

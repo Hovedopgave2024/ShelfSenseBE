@@ -6,6 +6,7 @@ import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -48,11 +49,15 @@ public class ComponentService
     }
 
     public void deleteComponent(int id) {
-        // Find the component by ID
         Component component = componentRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Component not found")
         );
-        // Delete the component
-        componentRepository.delete(component);
+
+        try {
+            componentRepository.delete(component);
+        } catch (DataIntegrityViolationException e) {
+            // Re-throw as a controlled exception for the 409 Conflict response
+            throw new IllegalStateException("Cannot delete component as it is associated with a product.");
+        }
     }
 }
