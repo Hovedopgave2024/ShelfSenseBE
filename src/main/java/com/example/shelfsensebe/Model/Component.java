@@ -6,11 +6,15 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.sql.Date;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
 public class Component
 {
     @Id
@@ -45,19 +49,19 @@ public class Component
     private int safetyStockRop;
 
     @Column(name = "supplier_stock")
-    private int supplierStock;
+    private Integer supplierStock;
 
     @Column(name = "supplier_safety_stock")
-    private int supplierSafetyStock;
+    private Integer supplierSafetyStock;
 
     @Column(name = "supplier_safety_stock_rop")
-    private int supplierSafetyStockRop;
+    private Integer supplierSafetyStockRop;
 
     @Column(name = "supplier_incoming_stock")
-    private int supplierIncomingStock;
+    private Integer supplierIncomingStock;
 
     @Column(name = "supplier_incoming_date")
-    private int supplierIncomingDate;
+    private Date supplierIncomingDate;
 
     @Column(name = "designator")
     private String designator;
