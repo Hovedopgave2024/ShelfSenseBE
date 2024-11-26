@@ -58,15 +58,6 @@ public class ComponentService
         return componentRepository.save(existingComponent);
     }
 
-    public void deleteComponent(int id) {
-        // Find the component by ID
-        Component component = componentRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Component not found")
-        );
-        // Delete the component
-        componentRepository.delete(component);
-    }
-
     public List<ComponentSupplierDTO> fetchAndUpdateComponentsWithSupplierInfo(String apiKey, int userId) {
         // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
         List<ComponentSupplierDTO> components = componentRepository.findBySupplierAndUser("Mouser", userId);
