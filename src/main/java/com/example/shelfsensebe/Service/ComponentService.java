@@ -49,15 +49,13 @@ public class ComponentService
     }
 
     public void deleteComponent(int id) {
+        // Find the component by ID
         Component component = componentRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Component not found")
         );
-
-        try {
-            componentRepository.delete(component);
-        } catch (DataIntegrityViolationException e) {
-            // Re-throw as a controlled exception for the 409 Conflict response
-            throw new IllegalStateException("Cannot delete component as it is associated with a product.");
-        }
+        // Delete the component
+        componentRepository.delete(component);
     }
+
+
 }

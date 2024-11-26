@@ -39,7 +39,7 @@ public class ComponentController {
     @PostMapping("/components")
     public ResponseEntity<Component> createComponent(@RequestBody Component component, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
+        if (userDTO == null || (component.getUserId() != null && !component.getUserId().equals(userDTO.getId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Component savedComponent = componentService.createComponent(component, userDTO);
@@ -62,13 +62,8 @@ public class ComponentController {
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        try {
-            componentService.deleteComponent(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // 409 Conflict
-        }
+        componentService.deleteComponent(id);
+        return ResponseEntity.noContent().build();
     }
-
 
 }
