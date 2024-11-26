@@ -41,7 +41,7 @@ public class ComponentController {
     @PostMapping("/components")
     public ResponseEntity<Component> createComponent(@RequestBody Component component, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null || (component.getUserId() != null && !component.getUserId().equals(userDTO.getId()))) {
+        if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Component savedComponent = componentService.createComponent(component, userDTO);
@@ -64,7 +64,7 @@ public class ComponentController {
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        componentService.deleteComponent(id);
+        componentService.deleteComponent(id, userDTO);
         return ResponseEntity.noContent().build();
     }
 

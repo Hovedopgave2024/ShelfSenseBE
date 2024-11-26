@@ -27,6 +27,13 @@ public class ComponentService
     @Autowired
     private WebClient webClient;
 
+    // Dedicated method for validating ownershipp
+    public void validateOwnership(UserDTO userDTO, Component component) {
+        if (userDTO == null || component == null || component.getUser().getId() != userDTO.getId()) {
+            throw new IllegalArgumentException("Unauthorized access: You do not own this component.");
+        }
+    }
+
     public Component createComponent(Component component, UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
@@ -35,10 +42,10 @@ public class ComponentService
     }
 
     public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO) {
-        // If the component with the given ID does not exist, throw an IllegalArgumentException.
         Component existingComponent = componentRepository.findById(id).orElseThrow(() ->
             new IllegalArgumentException("Component Not Found")
         );
+        validateOwnership(userDTO, existingComponent);
 
         existingComponent.setName(updatedComponent.getName());
         existingComponent.setType(updatedComponent.getType());
@@ -58,12 +65,11 @@ public class ComponentService
         return componentRepository.save(existingComponent);
     }
 
-    public void deleteComponent(int id) {
-        // Find the component by ID
+    public void deleteComponent(int id, UserDTO userDTO) {
         Component component = componentRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Component not found")
         );
-        // Delete the component
+        validateOwnership(userDTO, component);
         componentRepository.delete(component);
     }
 
