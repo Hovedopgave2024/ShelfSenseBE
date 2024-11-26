@@ -1,22 +1,29 @@
 package com.example.shelfsensebe.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class ApiUpdate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private Date lastUpdated;
+    @Column(name = "last_updated")
+    private LocalDateTime lastUpdated;
 
-    @OneToOne
+    @JsonBackReference(value = "user-apiUpdate")
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

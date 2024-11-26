@@ -34,7 +34,7 @@ public class ComponentService
     }
 
 
-    public List<ComponentSupplierDTO> fetchAndUpdateComponentWithSupplierInfo(String apiKey, int userId) {
+    public List<ComponentSupplierDTO> fetchAndUpdateComponentsWithSupplierInfo(String apiKey, int userId) {
         // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
         List<ComponentSupplierDTO> components = componentRepository.findBySupplierAndUser("Mouser", userId);
         List<ComponentSupplierDTO> updatedComponents = new ArrayList<>();
@@ -73,7 +73,7 @@ public class ComponentService
                         Object inStock = part.get("AvailabilityInStock");
                         int stockValue = Integer.parseInt(inStock.toString());
                         if (stockValue > 0) {
-                            component.setSupplierStock(Integer.parseInt(inStock.toString()));
+                            component.setSupplierStock(stockValue);
                         } else component.setSupplierStock(null);
 
                         List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");

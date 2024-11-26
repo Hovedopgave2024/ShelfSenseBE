@@ -6,12 +6,15 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Date;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
 public class Component
 {
     @Id

@@ -4,6 +4,7 @@ import com.example.shelfsensebe.DTO.ComponentSupplierDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ApiUpdateRepository;
 import com.example.shelfsensebe.Repository.ComponentRepository;
+import com.example.shelfsensebe.Service.ApiUpdateService;
 import com.example.shelfsensebe.Service.ComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ public class ComponentController {
 
     @Autowired
     ComponentService componentService;
+
+    @Autowired
+    ApiUpdateService apiUpdateService;
 
     @GetMapping("/components")
     public ResponseEntity<List<Component>> getComponents(HttpSession session) {
@@ -45,7 +49,7 @@ public class ComponentController {
     }
 
     @PostMapping("components/mouser")
-    public ResponseEntity<List<ComponentSupplierDTO>> fetchAndUpdateComponentData(@RequestBody Map<String, String> requestBody, HttpSession session) {
+    public ResponseEntity<List<ComponentSupplierDTO>> fetchApiAndUpdateUserComponentsData(@RequestBody Map<String, String> requestBody, HttpSession session) {
         int userId = Integer.parseInt(requestBody.get("userId"));
         String apiKey = requestBody.get("apiKey");
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
@@ -53,9 +57,9 @@ public class ComponentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
-            List<ComponentSupplierDTO> updatedComponents = componentService.fetchAndUpdateComponentWithSupplierInfo(apiKey, userDTO.getId());
+            List<ComponentSupplierDTO> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
             System.out.println(updatedComponents);
-            
+            apiUpdateService.updateApiLastUpdated(userDTO.getId());
             return ResponseEntity.ok(updatedComponents);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
