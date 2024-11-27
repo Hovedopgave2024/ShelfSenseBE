@@ -1,8 +1,6 @@
 package com.example.shelfsensebe.Controller;
 
-import com.example.shelfsensebe.DTO.ComponentSupplierDTO;
 import com.example.shelfsensebe.Model.Component;
-import com.example.shelfsensebe.Repository.ApiUpdateRepository;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ApiUpdateService;
 import com.example.shelfsensebe.Service.ComponentService;
@@ -69,7 +67,7 @@ public class ComponentController {
     }
 
     @PostMapping("components/mouser")
-    public ResponseEntity<List<ComponentSupplierDTO>> fetchApiAndUpdateUserComponentsData(@RequestBody Map<String, String> requestBody, HttpSession session) {
+    public ResponseEntity<List<Component>> fetchApiAndUpdateUserComponentsData(@RequestBody Map<String, String> requestBody, HttpSession session) {
         int userId = Integer.parseInt(requestBody.get("userId"));
         String apiKey = requestBody.get("apiKey");
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
@@ -77,7 +75,7 @@ public class ComponentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         try {
-            List<ComponentSupplierDTO> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
+            List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
             System.out.println(updatedComponents);
             apiUpdateService.updateApiLastUpdated(userDTO.getId());
             return ResponseEntity.ok(updatedComponents);
