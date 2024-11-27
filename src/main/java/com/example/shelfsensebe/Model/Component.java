@@ -72,6 +72,12 @@ public class Component
     @Column(name = "supplier_part")
     private String supplierPart;
 
+    @Column(name = "stock_status", nullable = false)
+    private int stockStatus;
+
+    @Column(name = "supplier_stock_status")
+    private int supplierStockStatus;
+
     @JsonIgnore
     @JsonManagedReference("component-productComponentList")
     @OneToMany(mappedBy = "component")
