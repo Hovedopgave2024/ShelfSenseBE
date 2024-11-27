@@ -4,15 +4,12 @@ import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Product;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ProductRepository;
-import com.example.shelfsensebe.Repository.UserRepository;
+import com.example.shelfsensebe.Service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,7 +20,17 @@ public class ProductController {
     ProductRepository productRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private ProductService productService;
+
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<Integer> deleteProduct(@PathVariable int id, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        productService.deleteProduct(id, userDTO);
+        return ResponseEntity.noContent().build();
+    }
 
 
     @GetMapping("/products")

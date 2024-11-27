@@ -27,6 +27,9 @@ public class SalesOrder
     @Column(name = "created_date", nullable = false)
     private Date createdDate;
 
+    @Column(name = "product_id", nullable = false)
+    private int productId;
+
     @JsonBackReference("user-salesOrderList")
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -35,15 +38,5 @@ public class SalesOrder
     @JsonProperty("userId")
     public Integer getUserId() {
         return user != null ? user.getId() : null;
-    }
-
-    @JsonBackReference("product-salesOrderList")
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @JsonProperty("productId")
-    public Integer getProductId() {
-        return product != null ? product.getId() : null;
     }
 }

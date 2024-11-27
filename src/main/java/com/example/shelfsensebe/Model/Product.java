@@ -25,13 +25,8 @@ public class Product
     private double price;
 
     @JsonManagedReference("product-productComponentList")
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductComponent> productComponentList;
-
-    @JsonIgnore
-    @JsonManagedReference("product-salesOrderList")
-    @OneToMany(mappedBy = "product")
-    private List<SalesOrder> salesOrderList;
 
     @JsonBackReference("user-productList")
     @ManyToOne
