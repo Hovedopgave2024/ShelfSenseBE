@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class StatusCalculator
 {
-
     public int calculateStatus(int stock, int safetyStock, int stockROP) {
         int median = (safetyStock + stockROP) / 2;
         if (stock > stockROP) {
