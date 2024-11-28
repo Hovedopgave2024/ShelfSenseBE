@@ -22,8 +22,8 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @DeleteMapping("/products/{id}")
-    public ResponseEntity<Integer> deleteProduct(@PathVariable int id, HttpSession session) {
+    @DeleteMapping("/products")
+    public ResponseEntity<Integer> deleteProductById(@RequestBody int id, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -34,7 +34,7 @@ public class ProductController {
 
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(HttpSession session) {
+    public ResponseEntity<List<Product>> getProductsByUserId(HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -71,6 +71,21 @@ public class ProductController {
 
         // Return the created Product
         return ResponseEntity.ok(product);
+    }
+
+    @PutMapping("/products")
+    public ResponseEntity<Product> updateProductById(@RequestBody Product updatedProduct) {
+        try {
+            Product savedProduct = productService.updateProduct(updatedProduct);
+            return ResponseEntity.ok(savedProduct);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 }
