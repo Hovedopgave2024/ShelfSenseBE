@@ -66,14 +66,6 @@ public class ProductService
                 ? updatedProduct.getProductComponentList()
                 : new ArrayList<>();
 
-        // Check if the frontend has sent duplicate productComponent ids
-        Set<Integer> productComponentIds = new HashSet<>();
-        for (ProductComponent pc : updatedProductComponents) {
-            if (!productComponentIds.add(pc.getId())) {
-                throw new IllegalArgumentException("Duplicate ProductComponent ID found: " + pc.getId());
-            }
-        }
-
         // Track productComponent to delete
         List<ProductComponent> productComponentsToUpdate = new ArrayList<>();
         List<ProductComponent> productComponentsToDelete = new ArrayList<>();
