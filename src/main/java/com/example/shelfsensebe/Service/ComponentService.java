@@ -53,10 +53,7 @@ public class ComponentService
                 new IllegalArgumentException("Component Not Found")
         );
         validateOwnership(userDTO, existingComponent);
-
-
-
-
+        
         existingComponent.setName(updatedComponent.getName());
         existingComponent.setType(updatedComponent.getType());
         existingComponent.setFootprint(updatedComponent.getFootprint());
