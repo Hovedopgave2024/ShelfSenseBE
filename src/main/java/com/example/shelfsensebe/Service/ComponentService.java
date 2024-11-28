@@ -1,15 +1,12 @@
 package com.example.shelfsensebe.Service;
 
-import com.example.shelfsensebe.DTO.ComponentSupplierDTO;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
+import com.example.shelfsensebe.utility.StatusCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -26,6 +23,8 @@ public class ComponentService
 
     @Autowired
     private WebClient webClient;
+    @Autowired
+    private StatusCalculator statusCalculator;
 
     // Dedicated method for validating ownershipp
     public void validateOwnership(UserDTO userDTO, Component component) {
@@ -37,15 +36,26 @@ public class ComponentService
     public Component createComponent(Component component, UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
+
+        component.setStockStatus(statusCalculator.calculateStatus(
+                component.getStock(),
+                component.getSafetyStock(),
+                component.getSafetyStockRop()
+        ));
+
         component.setUser(user);
         return componentRepository.save(component);
     }
 
-    public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO) {
+    public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO)
+    {
         Component existingComponent = componentRepository.findById(id).orElseThrow(() ->
-            new IllegalArgumentException("Component Not Found")
+                new IllegalArgumentException("Component Not Found")
         );
         validateOwnership(userDTO, existingComponent);
+
+
+
 
         existingComponent.setName(updatedComponent.getName());
         existingComponent.setType(updatedComponent.getType());
@@ -62,6 +72,19 @@ public class ComponentService
         existingComponent.setManufacturer(updatedComponent.getManufacturer());
         existingComponent.setSupplierPart(updatedComponent.getSupplierPart());
 
+        existingComponent.setStockStatus(statusCalculator.calculateStatus(updatedComponent.getStock(),
+                updatedComponent.getSafetyStock(), updatedComponent.getSafetyStockRop()));
+
+     if (updatedComponent.getSupplierSafetyStock() != null && updatedComponent.getSupplierSafetyStockRop() != null && existingComponent.getSupplierStock() != null)
+     {
+            existingComponent.setSupplierStockStatus(statusCalculator.calculateStatus(
+                    existingComponent.getSupplierStock(),
+                    updatedComponent.getSupplierSafetyStock(),
+                    updatedComponent.getSupplierSafetyStockRop()
+            ));
+     }
+
+
         return componentRepository.save(existingComponent);
     }
 
@@ -73,10 +96,10 @@ public class ComponentService
         componentRepository.delete(component);
     }
 
-    public List<ComponentSupplierDTO> fetchAndUpdateComponentsWithSupplierInfo(String apiKey, int userId) {
+    public List<Component> fetchAndUpdateComponentsWithSupplierInfo(String apiKey, int userId) {
         // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
-        List<ComponentSupplierDTO> components = componentRepository.findBySupplierAndUser("Mouser", userId);
-        List<ComponentSupplierDTO> updatedComponents = new ArrayList<>();
+        List<Component> components = componentRepository.findBySupplierAndUser_Id("Mouser", userId);
+        List<Component> updatedComponents = new ArrayList<>();
 
         components.forEach(component -> {
             try {
@@ -133,10 +156,16 @@ public class ComponentService
                     }
                 }
 
+                component.setSupplierStockStatus(statusCalculator.calculateStatus(
+                        component.getSupplierStock(),
+                        component.getSupplierSafetyStock(),
+                        component.getSupplierSafetyStockRop()
+                ));
+
                 // save updated component columns and add them to a list that is returned to the frontend.
                 updatedComponents.add(component);
 
-                componentRepository.updateComponentData(component.getId(), component.getSupplierStock(), component.getSupplierIncomingStock(), component.getSupplierIncomingDate());
+                componentRepository.save(component);
             } catch(Exception e) {
                 System.err.println("Error processing component: " + component.getId() + " - " + e.getMessage());
             }
