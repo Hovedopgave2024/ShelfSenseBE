@@ -47,6 +47,9 @@ public class Component
     @Column(name = "safety_stock_rop", nullable = false)
     private int safetyStockRop;
 
+    @Column(name = "stock_status", nullable = false)
+    private int stockStatus;
+
     @Column(name = "supplier_stock")
     private Integer supplierStock;
 
@@ -55,6 +58,9 @@ public class Component
 
     @Column(name = "supplier_safety_stock_rop")
     private Integer supplierSafetyStockRop;
+
+    @Column(name = "supplier_stock_status")
+    private Integer supplierStockStatus;
 
     @Column(name = "supplier_incoming_stock")
     private Integer supplierIncomingStock;
@@ -70,12 +76,6 @@ public class Component
 
     @Column(name = "supplier_part")
     private String supplierPart;
-
-    @Column(name = "stock_status", nullable = false)
-    private int stockStatus;
-
-    @Column(name = "supplier_stock_status")
-    private int supplierStockStatus;
 
     @JsonIgnore
     @JsonManagedReference("component-productComponentList")
