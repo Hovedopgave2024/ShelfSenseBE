@@ -92,15 +92,14 @@ public class ProductService
                         existingPC.setQuantity(updatedPC.getQuantity());
                     }
 
-                    System.out.println(existingPC.getComponentId());
-                    System.out.println(updatedPC.getComponentId());
+                    int existingComponentId = existingPC.getComponentId();
+                    int updatedComponentId = updatedPC.getComponentId();
 
-                    /* // Update component if it differs
-                    if (existingPC.getComponentId() != (updatedPC.getComponentId())) {
+                    if (existingComponentId != updatedComponentId) {
                         Component newComponent = componentRepository.findById(updatedPC.getComponentId())
                                 .orElseThrow(() -> new IllegalArgumentException("Component not found for ID: " + updatedPC.getComponentId()));
                         existingPC.setComponent(newComponent);
-                    } */
+                    }
 
                     productComponentsToUpdate.add(existingPC);
                     updatedProductComponents.remove(updatedPC);
@@ -119,11 +118,18 @@ public class ProductService
 
         // Handle additions
         for (ProductComponent newPC : updatedProductComponents) {
+            if (newPC.getComponentId() != null) {
+                Component component = componentRepository.findById(newPC.getComponentId())
+                        .orElseThrow(() -> new IllegalArgumentException("Component not found for ID: " + newPC.getComponentId()));
+                newPC.setComponent(component);
+            } else {
+                throw new IllegalArgumentException("New ProductComponent must have a valid componentId");
+            }
             newPC.setProduct(existingProduct);
             productComponentsToAdd.add(newPC);
         }
 
-        // Batch save all updates and additions
+        // Batch save all updates and additions. Batch size is set in application properties
         productComponentRepository.saveAll(productComponentsToUpdate);
         productComponentRepository.saveAll(productComponentsToAdd);
         existingProductComponents.addAll(productComponentsToAdd);
