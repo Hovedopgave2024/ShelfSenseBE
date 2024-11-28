@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProductController {
@@ -23,7 +24,8 @@ public class ProductController {
     private ProductService productService;
 
     @DeleteMapping("/products")
-    public ResponseEntity<Integer> deleteProductById(@RequestBody int id, HttpSession session) {
+    public ResponseEntity<Integer> deleteProductById(@RequestBody Map<String, String> requestBody, HttpSession session) {
+        int id = Integer.parseInt(requestBody.get("id"));
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
