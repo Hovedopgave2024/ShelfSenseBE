@@ -24,8 +24,8 @@ public class ProductController {
     private ProductService productService;
 
     @DeleteMapping("/products")
-    public ResponseEntity<Integer> deleteProductById(@RequestBody Map<String, String> requestBody, HttpSession session) {
-        int id = Integer.parseInt(requestBody.get("id"));
+    public ResponseEntity<Integer> deleteProductById(@RequestBody Product product, HttpSession session) {
+        int id = product.getId();
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
