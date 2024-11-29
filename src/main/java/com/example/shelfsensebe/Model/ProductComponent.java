@@ -1,10 +1,8 @@
 package com.example.shelfsensebe.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,9 +33,13 @@ public class ProductComponent
     @JoinColumn(name = "component_id")
     private Component component;
 
+    @Transient
+    private Integer componentId; // To capture value from frontend
+
     @JsonProperty("componentId")
     public Integer getComponentId() {
-        return component != null ? component.getId() : null;
+        // Use componentId from the frontend if set, otherwise fallback to component.getId()
+        return (componentId != null) ? componentId : (component != null ? component.getId() : null);
     }
 
 }
