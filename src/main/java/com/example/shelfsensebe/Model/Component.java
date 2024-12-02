@@ -1,14 +1,19 @@
 package com.example.shelfsensebe.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.sql.Date;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
 public class Component
 {
     @Id
@@ -39,17 +44,29 @@ public class Component
     @Column(name = "safety_stock", nullable = false)
     private int safetyStock;
 
-    @Column(name ="safety_stock_rop", nullable = false)
+    @Column(name = "safety_stock_rop", nullable = false)
     private int safetyStockRop;
 
+    @Column(name = "stock_status", nullable = false)
+    private int stockStatus;
+
     @Column(name = "supplier_stock")
-    private int supplierStock;
+    private Integer supplierStock;
 
     @Column(name = "supplier_safety_stock")
-    private int supplierSafetyStock;
+    private Integer supplierSafetyStock;
 
-    @Column(name ="supplier_safety_stock_rop")
-    private int supplierSafetyStockRop;
+    @Column(name = "supplier_safety_stock_rop")
+    private Integer supplierSafetyStockRop;
+
+    @Column(name = "supplier_stock_status")
+    private Integer supplierStockStatus;
+
+    @Column(name = "supplier_incoming_stock")
+    private Integer supplierIncomingStock;
+
+    @Column(name = "supplier_incoming_date")
+    private Date supplierIncomingDate;
 
     @Column(name = "designator")
     private String designator;
@@ -60,6 +77,7 @@ public class Component
     @Column(name = "supplier_part")
     private String supplierPart;
 
+    @JsonIgnore
     @JsonManagedReference("component-productComponentList")
     @OneToMany(mappedBy = "component")
     private List<ProductComponent> productComponentList;
@@ -68,4 +86,9 @@ public class Component
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @JsonProperty("userId")
+    public Integer getUserId() {
+        return user != null ? user.getId() : null;
+    }
 }

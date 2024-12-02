@@ -9,6 +9,8 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    List<Product> findByUserId(int userId);
+    List<Product> findByUser_Id(int userId);
+
+    boolean existsByNameAndUser_Id(String name, int userId);
 
 }

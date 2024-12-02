@@ -2,13 +2,15 @@ package com.example.shelfsensebe.Model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
-public class User
-{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -30,4 +32,8 @@ public class User
     @JsonManagedReference("user-salesOrderList")
     @OneToMany(mappedBy = "user")
     private List<SalesOrder> salesOrderList;
+
+    @JsonManagedReference("user-apiUpdate")
+    @OneToOne(mappedBy = "user")
+    private ApiUpdate apiUpdate;
 }

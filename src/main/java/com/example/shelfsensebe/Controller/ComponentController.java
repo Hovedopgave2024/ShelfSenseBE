@@ -2,21 +2,29 @@ package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ComponentRepository;
+import com.example.shelfsensebe.Service.ApiUpdateService;
+import com.example.shelfsensebe.Service.ComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import com.example.shelfsensebe.DTO.UserDTO;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ComponentController {
 
     @Autowired
     ComponentRepository componentRepository;
+
+    @Autowired
+    ComponentService componentService;
+
+    @Autowired
+    ApiUpdateService apiUpdateService;
 
     @GetMapping("/components")
     public ResponseEntity<List<Component>> getComponents(HttpSession session) {
@@ -25,6 +33,55 @@ public class ComponentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         int userId = userDTO.getId();
-        return ResponseEntity.ok(componentRepository.findByUserId(userId));
+        return ResponseEntity.ok(componentRepository.findByUser_Id(userId));
     }
+
+    @PostMapping("/components")
+    public ResponseEntity<Component> createComponent(@RequestBody Component component, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Component savedComponent = componentService.createComponent(component, userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
+    }
+
+    @PutMapping("/components/{id}")
+    public ResponseEntity<Component> updateComponent(@PathVariable int id, @RequestBody Component updatedComponent, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Component savedComponent = componentService.updateComponent(id, updatedComponent, userDTO);
+        return ResponseEntity.ok(savedComponent);
+    }
+
+    @DeleteMapping("/components/{id}")
+    public ResponseEntity<Void> deleteComponent(@PathVariable int id, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        componentService.deleteComponent(id, userDTO);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("components/mouser")
+    public ResponseEntity<List<Component>> fetchApiAndUpdateUserComponentsData(@RequestBody Map<String, String> requestBody, HttpSession session) {
+        int userId = Integer.parseInt(requestBody.get("userId"));
+        String apiKey = requestBody.get("apiKey");
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null || userDTO.getId() != userId) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
+            System.out.println(updatedComponents);
+            apiUpdateService.updateApiLastUpdated(userDTO.getId());
+            return ResponseEntity.ok(updatedComponents);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }

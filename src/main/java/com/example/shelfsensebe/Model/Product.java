@@ -3,12 +3,15 @@ package com.example.shelfsensebe.Model;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
 public class Product
 {
     @Id
@@ -22,7 +25,7 @@ public class Product
     private double price;
 
     @JsonManagedReference("product-productComponentList")
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductComponent> productComponentList;
 
     @JsonBackReference("user-productList")
@@ -30,14 +33,9 @@ public class Product
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonManagedReference("product-salesOrderList")
-    @OneToMany(mappedBy = "product")
-    private List<SalesOrder> salesOrderList;
-
-
-
-
-
-
+    @JsonProperty("userId")
+    public Integer getUserId() {
+        return user != null ? user.getId() : null;
+    }
 
 }
