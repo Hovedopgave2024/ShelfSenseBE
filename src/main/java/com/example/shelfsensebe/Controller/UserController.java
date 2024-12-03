@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import com.example.shelfsensebe.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.example.shelfsensebe.DTO.UserDTO;
 
@@ -15,6 +16,9 @@ public class UserController
 {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(HttpSession session, @PathVariable int id) {
@@ -40,7 +44,7 @@ public class UserController
 
         Optional<User> userOptional = userRepository.findByName(user.getName());
 
-        if (userOptional.isEmpty() || !userOptional.get().getPassword().equals(user.getPassword())) {
+        if (userOptional.isEmpty() || !passwordEncoder.matches(user.getPassword(), userOptional.get().getPassword())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         UserDTO userDTO = new UserDTO(userOptional.get().getId(), userOptional.get().getName());
