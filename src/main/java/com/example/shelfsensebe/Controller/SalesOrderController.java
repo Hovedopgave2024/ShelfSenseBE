@@ -17,13 +17,5 @@ public class SalesOrderController {
     @Autowired
     SalesOrderRepository salesOrderRepository;
 
-    @GetMapping("/salesorders")
-    public ResponseEntity<List<SalesOrder>> getSalesOrderByUserId(HttpSession session) {
-        UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        int userId = userDTO.getId();
-        return ResponseEntity.ok(salesOrderRepository.findByUser_Id(userId));
-    }
+
 }
