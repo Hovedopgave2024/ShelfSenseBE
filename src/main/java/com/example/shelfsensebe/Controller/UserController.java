@@ -93,7 +93,7 @@ public class UserController
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
-        return ResponseEntity.ok("Logout successful");
+        return ResponseEntity.ok().build();
     }
 
     // Checking if session is active
