@@ -7,6 +7,6 @@ public class TextSanitizer {
 
     public String sanitize(String input) {
         // Remove < and >, then clean up leading/trailing spaces
-        return input.replaceAll("[<>]", "").replaceAll("^\\s+|\\s+$", "");
+        return input.replaceAll("[<>]", "");
     }
 }

@@ -5,7 +5,10 @@ import com.example.shelfsensebe.Model.Product;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import com.example.shelfsensebe.Service.ProductService;
+import com.example.shelfsensebe.utility.IntValidator;
+import com.example.shelfsensebe.utility.TextSanitizer;
 import jakarta.servlet.http.HttpSession;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,12 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    TextSanitizer textSanitizer;
+
+    @Autowired
+    IntValidator intValidator;
 
     @DeleteMapping("/products")
     public ResponseEntity<Integer> deleteProductById(@RequestBody Product product, HttpSession session) {
@@ -46,7 +55,7 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product, HttpSession session) {
+    public ResponseEntity<Product> addProduct(@RequestBody Product product, HttpSession session) throws BadRequestException {
         // Fetch the logged-in user
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
@@ -66,8 +75,12 @@ public class ProductController {
 
         // Create and save the new Product
         product.setUser(user);
-        product.setName(product.getName());
-        product.setPrice(product.getPrice());
+        String sanitizedName = textSanitizer.sanitize(product.getName());
+        System.out.println(sanitizedName);
+        product.setName(sanitizedName);
+        double validatedPrice = intValidator.validateDouble(product.getPrice(), 0.0, null, false);
+        product.setPrice(validatedPrice);
+        System.out.println(validatedPrice);
 
         productRepository.save(product);
 
@@ -76,8 +89,16 @@ public class ProductController {
     }
 
     @PutMapping("/products")
-    public ResponseEntity<Product> updateProductById(@RequestBody Product updatedProduct) {
+    public ResponseEntity<Product> updateProductById(@RequestBody Product updatedProduct, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
+            updatedProduct.setName(textSanitizer.sanitize(updatedProduct.getName()));
+            updatedProduct.setPrice(intValidator.validateDouble(updatedProduct.getPrice(), 0.0, null, false));
+            
             Product savedProduct = productService.updateProduct(updatedProduct);
             return ResponseEntity.ok(savedProduct);
 
