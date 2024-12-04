@@ -2,10 +2,11 @@ package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Product;
+import com.example.shelfsensebe.Model.ProductComponent;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import com.example.shelfsensebe.Service.ProductService;
-import com.example.shelfsensebe.utility.IntValidator;
+import com.example.shelfsensebe.utility.NumberValidator;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import jakarta.servlet.http.HttpSession;
 import org.apache.coyote.BadRequestException;
@@ -15,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class ProductController {
@@ -30,7 +30,7 @@ public class ProductController {
     TextSanitizer textSanitizer;
 
     @Autowired
-    IntValidator intValidator;
+    NumberValidator numberValidator;
 
     @DeleteMapping("/products")
     public ResponseEntity<Integer> deleteProductById(@RequestBody Product product, HttpSession session) {
@@ -78,7 +78,7 @@ public class ProductController {
         String sanitizedName = textSanitizer.sanitize(product.getName());
         System.out.println(sanitizedName);
         product.setName(sanitizedName);
-        double validatedPrice = intValidator.validateDouble(product.getPrice(), 0.0, null, false);
+        double validatedPrice = numberValidator.validateDouble(product.getPrice(), 0.0, null);
         product.setPrice(validatedPrice);
         System.out.println(validatedPrice);
 
@@ -97,8 +97,7 @@ public class ProductController {
 
         try {
             updatedProduct.setName(textSanitizer.sanitize(updatedProduct.getName()));
-            updatedProduct.setPrice(intValidator.validateDouble(updatedProduct.getPrice(), 0.0, null, false));
-            
+            updatedProduct.setPrice(numberValidator.validateDouble(updatedProduct.getPrice(), 0.0, null));
             Product savedProduct = productService.updateProduct(updatedProduct);
             return ResponseEntity.ok(savedProduct);
 

@@ -1,11 +1,12 @@
 package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.DTO.UserDTO;
-import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.ProductComponent;
 import com.example.shelfsensebe.Repository.ProductComponentRepository;
 import com.example.shelfsensebe.Service.ProductComponentService;
+import com.example.shelfsensebe.utility.NumberValidator;
 import jakarta.servlet.http.HttpSession;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,6 @@ public class ProductComponentController
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         List<ProductComponent> savedProductComponents = productComponentService.saveProductComponents(productComponents);
 
         return ResponseEntity.ok(savedProductComponents);
