@@ -8,9 +8,9 @@ import org.springframework.web.client.HttpClientErrorException;
 
 @Component
 public class UserValidator {
-    public void validateSessionUser(HttpSession session, int id) {
+    public void validateSessionUser(HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null || userDTO.getId() != id) {
+        if (userDTO == null) {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "User is not authorized");
         }
     }
