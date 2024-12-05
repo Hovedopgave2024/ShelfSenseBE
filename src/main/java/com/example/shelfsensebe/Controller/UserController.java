@@ -39,7 +39,11 @@ public class UserController
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         if (userRepository.findByName(user.getName()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(null);
