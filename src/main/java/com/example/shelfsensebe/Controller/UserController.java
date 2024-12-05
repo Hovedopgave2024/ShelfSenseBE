@@ -2,6 +2,7 @@ package com.example.shelfsensebe.Controller;
 import com.example.shelfsensebe.DTO.UpdateUserDTO;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.utility.PasswordValidator;
+import com.example.shelfsensebe.utility.TextSanitizer;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import com.example.shelfsensebe.Repository.UserRepository;
@@ -25,6 +26,9 @@ public class UserController
     @Autowired
     PasswordValidator passwordValidator;
 
+    @Autowired
+    TextSanitizer textSanitizer;
+
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(HttpSession session, @PathVariable int id) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
@@ -35,11 +39,17 @@ public class UserController
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user, HttpSession session) {
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
+        if (userDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         if (userRepository.findByName(user.getName()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(null);
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setName(textSanitizer.sanitize(user.getName()));
         User savedUser = userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
@@ -70,11 +80,11 @@ public class UserController
         // Validate new password (minimum requirements)
         if (
                 !passwordValidator.isValidPassword(updateUserDTO.getNewPassword()) ||
-                        !passwordEncoder.matches(updateUserDTO.getOldPassword(), user.getPassword())
+                !passwordEncoder.matches(updateUserDTO.getOldPassword(), user.getPassword())
         ) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        user.setName(updateUserDTO.getName());
+        user.setName(textSanitizer.sanitize(updateUserDTO.getName()));
         user.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword()));
         userRepository.save(user);
 
@@ -87,7 +97,7 @@ public class UserController
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
-        return ResponseEntity.ok("Logout successful");
+        return ResponseEntity.ok().build();
     }
 
     // Checking if session is active
