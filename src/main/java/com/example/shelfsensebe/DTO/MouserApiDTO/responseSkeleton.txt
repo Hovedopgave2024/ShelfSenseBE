@@ -1,0 +1,90 @@
+{
+  "Errors": [],
+  "SearchResults": {
+    "NumberOfResult": 1,
+    "Parts": [
+      {
+        "Availability": "16 In Stock",
+        "DataSheetUrl": "",
+        "Description": "PLC Controllers LOGO  24CE. 8DI(4AI)/4DO. 400 Blocks",
+        "FactoryStock": "0",
+        "ImagePath": "https://www.mouser.com/images/siemens/images/6ED10521CC080BA2_SPL.jpg",
+        "Category": "PLC Controllers",
+        "LeadTime": "23 Days",
+        "LifecycleStatus": "New Product",
+        "Manufacturer": "Siemens",
+        "ManufacturerPartNumber": "6ED10521CC080BA2",
+        "Min": "1",
+        "Mult": "1",
+        "MouserPartNumber": "982-6ED10521CC080BA2",
+        "ProductAttributes": [
+          {
+            "AttributeName": "Standard Pack Qty",
+            "AttributeValue": "1"
+          }
+        ],
+        "PriceBreaks": [
+          {
+            "Quantity": 1,
+            "Price": "1.553,69 kr.",
+            "Currency": "DKK"
+          },
+          {
+            "Quantity": 10,
+            "Price": "1.532,84 kr.",
+            "Currency": "DKK"
+          },
+          {
+            "Quantity": 25,
+            "Price": "1.511,63 kr.",
+            "Currency": "DKK"
+          },
+          {
+            "Quantity": 50,
+            "Price": "1.508,19 kr.",
+            "Currency": "DKK"
+          }
+        ],
+        "AlternatePackagings": null,
+        "ProductDetailUrl": "https://www.mouser.dk/ProductDetail/Siemens/6ED10521CC080BA2?qs=HFfMDpzxxd3HkL7LdRg1vQ%3D%3D",
+        "Reeling": false,
+        "ROHSStatus": "RoHS Compliant",
+        "SuggestedReplacement": "",
+        "MultiSimBlue": 0,
+        "UnitWeightKg": {
+          "UnitWeight": 0.228156776
+        },
+        "AvailabilityInStock": "16",
+        "AvailabilityOnOrder": [
+          {
+            "Quantity": 3,
+            "Date": "2025-02-13T00:00:00"
+          }
+        ],
+        "InfoMessages": [],
+        "ProductCompliance": [
+          {
+            "ComplianceName": "USHTS",
+            "ComplianceValue": "8537109160"
+          },
+          {
+            "ComplianceName": "JPHTS",
+            "ComplianceValue": "853710000"
+          },
+          {
+            "ComplianceName": "KRHTS",
+            "ComplianceValue": "8537102020"
+          },
+          {
+            "ComplianceName": "BRHTS",
+            "ComplianceValue": "85371020"
+          },
+          {
+            "ComplianceName": "ECCN",
+            "ComplianceValue": "EAR99"
+          }
+        ]
+      }
+    ]
+  }
+}

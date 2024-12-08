@@ -1,5 +1,6 @@
 package com.example.shelfsensebe.Service;
 
+import com.example.shelfsensebe.DTO.MouserApiDTO.*;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
@@ -7,8 +8,10 @@ import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.utility.StatusCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -107,57 +110,55 @@ public class ComponentService
 
         components.forEach(component -> {
             try {
-                // mouser API request:
-                Map<String, Object> requestBody = Map.of(
-                        "SearchByKeywordMfrNameRequest", Map.of(
-                                "manufacturerName", component.getManufacturer(),
-                                "keyword", component.getManufacturerPart(),
-                                "records", 1,
-                                "pageNumber", 0,
-                                "searchOptions", "",
-                                "searchWithYourSignUpLanguage", ""
-                        )
+                SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
+                        component.getManufacturer(),
+                        component.getManufacturerPart(),
+                        1,    // records
+                        0,    // pageNumber
+                        "",   // searchOptions
+                        ""    // searchWithYourSignUpLanguage
                 );
+                SearchByKeywordRequestBodyDTO requestBody = new SearchByKeywordRequestBodyDTO(keywordRequest);
 
-                Map<String, Object> apiResponse = webClient.post()
+                MouserResponseDTO apiResponse = webClient.post()
                         .uri(uriBuilder -> uriBuilder.path("/search/keywordandmanufacturer")
                                 .queryParam("apiKey", apiKey)
                                 .build())
                         .bodyValue(requestBody)
                         .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
-                        })
+                        .bodyToMono(MouserResponseDTO.class)
                         .block();
-                Map<String, Object> searchResults = (Map<String, Object>) apiResponse.get("SearchResults");
 
-                // Clean the response to handle null errors and find the necessary info.
-                if (searchResults != null) {
-                    List<Map<String, Object>> parts = (List<Map<String, Object>>) searchResults.get("Parts");
-                    if (parts != null && !parts.isEmpty()) {
-                        Map<String, Object> part = parts.get(0);
+                if (apiResponse != null && apiResponse.getErrors() != null && !apiResponse.getErrors().isEmpty()) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "API Errors: " + String.join(", ", apiResponse.getErrors())
+                    );
+                }
 
-                        Object inStock = part.get("AvailabilityInStock");
-                        int stockValue = Integer.parseInt(inStock.toString());
-                        if (stockValue > 0) {
-                            component.setSupplierStock(stockValue);
-                        } else component.setSupplierStock(null);
+                SearchResultDTO searchResults = apiResponse.getSearchResults();
 
-                        List<Map<String, Object>> availabilityOnOrder = (List<Map<String, Object>>) part.get("AvailabilityOnOrder");
-                        if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
-                            Map<String, Object> firstOrder = availabilityOnOrder.get(0);
-                            Object quantity = firstOrder.get("Quantity");
-                            if (quantity != null) {
-                                component.setSupplierIncomingStock(Integer.parseInt(quantity.toString()));
-                            } else component.setSupplierIncomingStock(null);
-                            Object date = firstOrder.get("Date");
-                            if (date != null) {
-                                component.setSupplierIncomingDate(Date.valueOf(date.toString().split("T")[0]));
-                            } else component.setSupplierIncomingDate(null);
-                        } else {
-                            component.setSupplierIncomingDate(null);
-                            component.setSupplierIncomingStock(null);
-                        }
-                    }
+                if (searchResults == null || searchResults.getParts() == null || searchResults.getParts().isEmpty()) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "No search results found for component: " + component.getId()
+                    );
+                }
+
+                PartDTO part = searchResults.getParts().get(0);
+                if (part.getAvailabilityInStock() > 0) {
+                    component.setSupplierStock(part.getAvailabilityInStock());
+                } else {
+                    component.setSupplierStock(null);
+                }
+                List<AvailabilityOnOrderDTO> availabilityOnOrder = part.getAvailabilityOnOrder();
+                if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
+                    AvailabilityOnOrderDTO firstOrder = availabilityOnOrder.get(0);
+                    component.setSupplierIncomingStock(firstOrder.getQuantity());
+                    component.setSupplierIncomingDate(firstOrder.getDate());
+                } else {
+                    component.setSupplierIncomingStock(null);
+                    component.setSupplierIncomingDate(null);
                 }
 
                 component.setSupplierStockStatus(statusCalculator.calculateStatus(
@@ -165,13 +166,15 @@ public class ComponentService
                         component.getSupplierSafetyStock(),
                         component.getSupplierSafetyStockRop()
                 ));
-
-                // save updated component columns and add them to a list that is returned to the frontend.
+                componentRepository.save(component);
                 updatedComponents.add(component);
 
-                componentRepository.save(component);
             } catch(Exception e) {
-                System.err.println("Error processing component: " + component.getId() + " - " + e.getMessage());
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Error processing component: " + component.getId(),
+                        e
+                );
             }
         });
 
