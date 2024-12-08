@@ -108,8 +108,6 @@ public class ComponentService
         List<Component> components = componentRepository.findBySupplierAndUser_Id("Mouser", userId);
         List<Component> updatedComponents = new ArrayList<>();
 
-
-
         components.forEach(component -> {
             try {
                 SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
