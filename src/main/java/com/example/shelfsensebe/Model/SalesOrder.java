@@ -3,6 +3,7 @@ package com.example.shelfsensebe.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.Getter;
@@ -31,11 +32,13 @@ public class SalesOrder
     private Date createdDate;
 
     @Column(name = "product_id", nullable = false)
+    @Min(0)
     private int productId;
 
     @JsonBackReference("user-salesOrderList")
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @Valid
     private User user;
 
     @JsonProperty("userId")

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class ApiUpdate {
     @JsonBackReference(value = "user-apiUpdate")
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @Valid
     private User user;
 
     @JsonProperty("userId")

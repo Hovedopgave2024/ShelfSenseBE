@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -94,11 +95,13 @@ public class Component
     @JsonIgnore
     @JsonManagedReference("component-productComponentList")
     @OneToMany(mappedBy = "component")
+    @Valid
     private List<ProductComponent> productComponentList;
 
     @JsonBackReference("user-componentList")
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @Valid
     private User user;
 
     @JsonProperty("userId")

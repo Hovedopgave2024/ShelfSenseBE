@@ -3,6 +3,7 @@ package com.example.shelfsensebe.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,7 @@ public class ProductComponent
     @JsonBackReference("product-productComponentList")
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @Valid
     private Product product;
 
     @JsonProperty("productId")
@@ -33,10 +35,11 @@ public class ProductComponent
     @JsonBackReference("component-productComponentList")
     @ManyToOne
     @JoinColumn(name = "component_id")
+    @Valid
     private Component component;
 
     @Transient
-    private Integer componentId; // To capture value from frontend
+    private Integer componentId;
 
     @JsonProperty("componentId")
     public Integer getComponentId() {
