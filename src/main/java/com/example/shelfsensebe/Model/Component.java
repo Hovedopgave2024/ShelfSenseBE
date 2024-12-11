@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 import java.sql.Date;
 import java.util.List;
 
@@ -33,6 +36,7 @@ public class Component
     private String manufacturerPart;
 
     @Column(name = "price", nullable = false)
+    @Min(value = 0, message = "Price cannot be less than 0")
     private double price;
 
     @Column(name = "supplier", nullable = false)

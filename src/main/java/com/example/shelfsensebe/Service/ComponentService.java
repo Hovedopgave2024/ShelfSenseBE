@@ -5,7 +5,9 @@ import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
+import com.example.shelfsensebe.utility.NumberValidator;
 import com.example.shelfsensebe.utility.StatusCalculator;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
@@ -28,22 +30,23 @@ public class ComponentService
     private WebClient webClient;
     @Autowired
     private StatusCalculator statusCalculator;
+    @Autowired
+    NumberValidator numberValidator;
 
-    // Dedicated method for validating ownershipp
     public void validateOwnership(UserDTO userDTO, Component component) {
-        if (userDTO == null || component == null || component.getUser().getId() != userDTO.getId()) {
+        if (userDTO == null || component == null) {
             throw new IllegalArgumentException("Unauthorized access: You do not own this component.");
         }
     }
 
-    public Component createComponent(Component component, UserDTO userDTO) {
+    public Component createComponent(Component component, UserDTO userDTO) throws BadRequestException {
         User user = new User();
         user.setId(userDTO.getId());
 
         component.setStockStatus(statusCalculator.calculateStatus(
-                component.getStock(),
-                component.getSafetyStock(),
-                component.getSafetyStockRop()
+                numberValidator.validateInt(component.getStock()),
+                numberValidator.validateInt(component.getSafetyStock()),
+                numberValidator.validateInt(component.getSafetyStockRop())
         ));
 
         component.setUser(user);

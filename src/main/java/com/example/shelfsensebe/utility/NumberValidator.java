@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NumberValidator {
-    public Integer validateInt(int input, Integer min, Integer max) throws BadRequestException {
-        if ((min != null && input < min) || (max != null && input > max)) {
+    public Integer validateInt(int input) throws BadRequestException {
+        if (input < 0) {
             throw new BadRequestException();
         }
         return input;
