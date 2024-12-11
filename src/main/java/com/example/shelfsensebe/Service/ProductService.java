@@ -50,9 +50,6 @@ public class ProductService
         if (updatedProduct.getName() == null || updatedProduct.getName().isEmpty()) {
             throw new IllegalArgumentException("Product name cannot be null or empty");
         }
-        if (updatedProduct.getPrice() <= 0) {
-            throw new IllegalArgumentException("Product price must be greater than 0");
-        }
 
         // update product
         existingProduct.setName(updatedProduct.getName());

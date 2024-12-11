@@ -5,20 +5,16 @@ import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
-import com.example.shelfsensebe.utility.NumberValidator;
 import com.example.shelfsensebe.utility.StatusCalculator;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ComponentService
@@ -30,8 +26,6 @@ public class ComponentService
     private WebClient webClient;
     @Autowired
     private StatusCalculator statusCalculator;
-    @Autowired
-    NumberValidator numberValidator;
 
     public void validateOwnership(UserDTO userDTO, Component component) {
         if (userDTO == null || component == null) {
@@ -39,14 +33,14 @@ public class ComponentService
         }
     }
 
-    public Component createComponent(Component component, UserDTO userDTO) throws BadRequestException {
+    public Component createComponent(Component component, UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
 
         component.setStockStatus(statusCalculator.calculateStatus(
-                numberValidator.validateInt(component.getStock()),
-                numberValidator.validateInt(component.getSafetyStock()),
-                numberValidator.validateInt(component.getSafetyStockRop())
+                component.getStock(),
+                component.getSafetyStock(),
+                component.getSafetyStockRop()
         ));
 
         component.setUser(user);

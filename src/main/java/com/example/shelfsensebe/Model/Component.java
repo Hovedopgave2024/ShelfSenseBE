@@ -36,37 +36,47 @@ public class Component
     private String manufacturerPart;
 
     @Column(name = "price", nullable = false)
-    @Min(value = 0, message = "Price cannot be less than 0")
+    @Min(0)
     private double price;
 
     @Column(name = "supplier", nullable = false)
     private String supplier;
 
     @Column(name = "stock", nullable = false)
+    @Min(0)
     private int stock;
 
     @Column(name = "safety_stock", nullable = false)
+    @Min(0)
     private int safetyStock;
 
     @Column(name = "safety_stock_rop", nullable = false)
+    @Min(0)
     private int safetyStockRop;
 
     @Column(name = "stock_status", nullable = false)
+    @Min(1)
+    @Max(4)
     private int stockStatus;
 
     @Column(name = "supplier_stock")
+    @Min(0)
     private Integer supplierStock;
 
     @Column(name = "supplier_safety_stock")
+    @Min(0)
     private Integer supplierSafetyStock;
 
     @Column(name = "supplier_safety_stock_rop")
+    @Min(0)
     private Integer supplierSafetyStockRop;
 
     @Column(name = "supplier_stock_status")
+    @Min(0)
     private Integer supplierStockStatus;
 
     @Column(name = "supplier_incoming_stock")
+    @Min(0)
     private Integer supplierIncomingStock;
 
     @Column(name = "supplier_incoming_date")

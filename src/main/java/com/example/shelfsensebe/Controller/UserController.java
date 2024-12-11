@@ -4,6 +4,7 @@ import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.utility.PasswordValidator;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import com.example.shelfsensebe.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class UserController
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User user, HttpSession session) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -68,7 +69,7 @@ public class UserController
     }
 
     @PutMapping("/users")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UpdateUserDTO updateUserDTO, HttpSession session) {
+    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UpdateUserDTO updateUserDTO, HttpSession session) {
         // Validate session (ensure user is authenticated)
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null || userDTO.getId() != updateUserDTO.getId()) {

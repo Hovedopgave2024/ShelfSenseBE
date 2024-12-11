@@ -6,6 +6,7 @@ import com.example.shelfsensebe.Repository.ProductComponentRepository;
 import com.example.shelfsensebe.Service.ProductComponentService;
 import com.example.shelfsensebe.utility.NumberValidator;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class ProductComponentController
     }
 
     @PostMapping("/productComponents")
-    public ResponseEntity<List<ProductComponent>> addProductComponents(@RequestBody List<ProductComponent> productComponents, HttpSession session) {
+    public ResponseEntity<List<ProductComponent>> addProductComponents(@Valid @RequestBody List<ProductComponent> productComponents, HttpSession session) {
 
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {

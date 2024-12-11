@@ -20,11 +20,7 @@ public class ProductComponentService
 
     public List<ProductComponent> saveProductComponents(List<ProductComponent> productComponents) {
         productComponents.forEach(productComponent -> {
-            try {
-                productComponent.setQuantity(numberValidator.validateInt(productComponent.getQuantity(), 0, null));
-            } catch (BadRequestException e) {
-                throw new RuntimeException(e);
-            }
+            productComponent.setQuantity(productComponent.getQuantity());
         });
         return productComponentRepository.saveAll(productComponents);
     }
