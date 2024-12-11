@@ -26,7 +26,6 @@ public class ApiUpdate {
     @JsonBackReference(value = "user-apiUpdate")
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @Valid
     private User user;
 
     @JsonProperty("userId")

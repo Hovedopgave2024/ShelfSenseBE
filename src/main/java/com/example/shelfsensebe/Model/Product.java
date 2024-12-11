@@ -35,7 +35,6 @@ public class Product
     @JsonBackReference("user-productList")
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @Valid
     private User user;
 
     @JsonProperty("userId")

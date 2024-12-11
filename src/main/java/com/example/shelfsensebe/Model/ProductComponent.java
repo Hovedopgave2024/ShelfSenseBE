@@ -24,7 +24,6 @@ public class ProductComponent
     @JsonBackReference("product-productComponentList")
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @Valid
     private Product product;
 
     @JsonProperty("productId")
@@ -35,7 +34,6 @@ public class ProductComponent
     @JsonBackReference("component-productComponentList")
     @ManyToOne
     @JoinColumn(name = "component_id")
-    @Valid
     private Component component;
 
     @Transient

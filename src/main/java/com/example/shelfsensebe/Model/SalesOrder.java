@@ -38,7 +38,6 @@ public class SalesOrder
     @JsonBackReference("user-salesOrderList")
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @Valid
     private User user;
 
     @JsonProperty("userId")

@@ -24,21 +24,17 @@ public class User {
 
     @JsonManagedReference("user-componentList")
     @OneToMany(mappedBy = "user")
-    @Valid
     private List<Component> componentList;
 
     @JsonManagedReference("user-productList")
     @OneToMany(mappedBy = "user")
-    @Valid
     private List<Product> productList;
 
     @JsonManagedReference("user-salesOrderList")
     @OneToMany(mappedBy = "user")
-    @Valid
     private List<SalesOrder> salesOrderList;
 
     @JsonManagedReference("user-apiUpdate")
     @OneToOne(mappedBy = "user")
-    @Valid
     private ApiUpdate apiUpdate;
 }

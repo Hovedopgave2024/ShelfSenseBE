@@ -56,8 +56,6 @@ public class Component
     private int safetyStockRop;
 
     @Column(name = "stock_status", nullable = false)
-    @Min(1)
-    @Max(4)
     private int stockStatus;
 
     @Column(name = "supplier_stock")
@@ -95,13 +93,11 @@ public class Component
     @JsonIgnore
     @JsonManagedReference("component-productComponentList")
     @OneToMany(mappedBy = "component")
-    @Valid
     private List<ProductComponent> productComponentList;
 
     @JsonBackReference("user-componentList")
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @Valid
     private User user;
 
     @JsonProperty("userId")
