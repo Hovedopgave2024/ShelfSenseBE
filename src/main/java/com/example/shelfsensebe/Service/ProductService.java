@@ -7,6 +7,7 @@ import com.example.shelfsensebe.Model.ProductComponent;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Repository.ProductComponentRepository;
 import com.example.shelfsensebe.Repository.ProductRepository;
+import com.example.shelfsensebe.utility.TextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,9 @@ public class ProductService
 
     @Autowired
     private ComponentRepository componentRepository;
+
+    @Autowired
+    TextSanitizer textSanitizer;
 
     public void validateOwnership(UserDTO userDTO, Product product) {
         if (userDTO == null || product == null || product.getUser().getId() != userDTO.getId()) {
@@ -52,7 +56,7 @@ public class ProductService
         }
 
         // update product
-        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setName(textSanitizer.sanitize(updatedProduct.getName()));
         existingProduct.setPrice(updatedProduct.getPrice());
 
         // Get existing and updated productComponent lists

@@ -6,6 +6,7 @@ import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.utility.StatusCalculator;
+import com.example.shelfsensebe.utility.TextSanitizer;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,8 @@ public class ComponentService
     private WebClient webClient;
     @Autowired
     private StatusCalculator statusCalculator;
+    @Autowired
+    private TextSanitizer textSanitizer;
 
     public void validateOwnership(UserDTO userDTO, Component component) {
         if (userDTO == null || component == null) {
@@ -44,6 +47,14 @@ public class ComponentService
         ));
 
         component.setUser(user);
+        component.setName(textSanitizer.sanitize(component.getName()));
+        component.setType(textSanitizer.sanitize(component.getType()));
+        component.setFootprint(textSanitizer.sanitize(component.getFootprint()));
+        component.setManufacturerPart(textSanitizer.sanitize(component.getManufacturerPart()));
+        component.setSupplier(textSanitizer.sanitize(component.getSupplier()));
+        component.setDesignator(textSanitizer.sanitize(component.getDesignator()));
+        component.setManufacturer(textSanitizer.sanitize(component.getManufacturer()));
+        component.setSupplierPart(textSanitizer.sanitize(component.getSupplierPart()));
         return componentRepository.save(component);
     }
 
@@ -60,21 +71,21 @@ public class ComponentService
         } else {
             existingComponent.setStock(updatedComponent.getStock());
         }
-        
-        existingComponent.setName(updatedComponent.getName());
-        existingComponent.setType(updatedComponent.getType());
-        existingComponent.setFootprint(updatedComponent.getFootprint());
-        existingComponent.setManufacturerPart(updatedComponent.getManufacturerPart());
+
+        existingComponent.setName(textSanitizer.sanitize(updatedComponent.getName()));
+        existingComponent.setType(textSanitizer.sanitize(updatedComponent.getType()));
+        existingComponent.setFootprint(textSanitizer.sanitize(updatedComponent.getFootprint()));
+        existingComponent.setManufacturerPart(textSanitizer.sanitize(updatedComponent.getManufacturerPart()));
         existingComponent.setPrice(updatedComponent.getPrice());
-        existingComponent.setSupplier(updatedComponent.getSupplier());
+        existingComponent.setSupplier(textSanitizer.sanitize(updatedComponent.getSupplier()));
         existingComponent.setStock(updatedComponent.getStock());
         existingComponent.setSafetyStock(updatedComponent.getSafetyStock());
         existingComponent.setSafetyStockRop(updatedComponent.getSafetyStockRop());
         existingComponent.setSupplierSafetyStock(updatedComponent.getSupplierSafetyStock());
         existingComponent.setSupplierSafetyStockRop(updatedComponent.getSupplierSafetyStockRop());
-        existingComponent.setDesignator(updatedComponent.getDesignator());
-        existingComponent.setManufacturer(updatedComponent.getManufacturer());
-        existingComponent.setSupplierPart(updatedComponent.getSupplierPart());
+        existingComponent.setDesignator(textSanitizer.sanitize(updatedComponent.getDesignator()));
+        existingComponent.setManufacturer(textSanitizer.sanitize(updatedComponent.getManufacturer()));
+        existingComponent.setSupplierPart(textSanitizer.sanitize(updatedComponent.getSupplierPart()));
 
         existingComponent.setStockStatus(statusCalculator.calculateStatus(updatedComponent.getStock(),
                 updatedComponent.getSafetyStock(), updatedComponent.getSafetyStockRop()));

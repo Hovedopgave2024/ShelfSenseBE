@@ -78,7 +78,6 @@ public class UserController
 
         User user = userRepository.findById(userDTO.getId());
 
-        // Validate new password (minimum requirements)
         if (
                 !passwordValidator.isValidPassword(updateUserDTO.getNewPassword()) ||
                 !passwordEncoder.matches(updateUserDTO.getOldPassword(), user.getPassword())

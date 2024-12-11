@@ -2,11 +2,9 @@ package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Product;
-import com.example.shelfsensebe.Model.ProductComponent;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import com.example.shelfsensebe.Service.ProductService;
-import com.example.shelfsensebe.utility.NumberValidator;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -60,25 +58,18 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Create a new User instance
         User user = new User();
-
-        // Set the ID from userDTO
         user.setId(userDTO.getId());
 
-        // Validate if the product name already exists for this user
         if (productRepository.existsByNameAndUser_Id(product.getName(), user.getId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
-        // Create and save the new Product
         product.setUser(user);
         String sanitizedName = textSanitizer.sanitize(product.getName());
         product.setName(sanitizedName);
 
         productRepository.save(product);
-
-        // Return the created Product
         return ResponseEntity.ok(product);
     }
 
@@ -90,7 +81,6 @@ public class ProductController {
         }
 
         try {
-            updatedProduct.setName(textSanitizer.sanitize(updatedProduct.getName()));
             Product savedProduct = productService.updateProduct(updatedProduct);
             return ResponseEntity.ok(savedProduct);
         } catch (IllegalArgumentException e) {
