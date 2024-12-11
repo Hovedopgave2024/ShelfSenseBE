@@ -4,6 +4,7 @@ import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Service.ApiUpdateService;
 import com.example.shelfsensebe.Service.ComponentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class ComponentController {
     }
 
     @PostMapping("/components")
-    public ResponseEntity<Component> createComponent(@RequestBody Component component, HttpSession session) {
+    public ResponseEntity<Component> createComponent(@Valid @RequestBody Component component, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -47,7 +48,7 @@ public class ComponentController {
     }
 
     @PutMapping("/components/{id}")
-    public ResponseEntity<Component> updateComponent(@PathVariable int id, @RequestBody Component updatedComponent, HttpSession session) {
+    public ResponseEntity<Component> updateComponent(@Valid @PathVariable int id, @RequestBody Component updatedComponent, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -67,7 +68,7 @@ public class ComponentController {
     }
 
     @PostMapping("components/mouser")
-    public ResponseEntity<List<Component>> fetchApiAndUpdateUserComponentsData(@RequestBody Map<String, String> requestBody, HttpSession session) {
+    public ResponseEntity<List<Component>> fetchApiAndUpdateUserComponentsData(@Valid @RequestBody Map<String, String> requestBody, HttpSession session) {
         int userId = Integer.parseInt(requestBody.get("userId"));
         String apiKey = requestBody.get("apiKey");
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
