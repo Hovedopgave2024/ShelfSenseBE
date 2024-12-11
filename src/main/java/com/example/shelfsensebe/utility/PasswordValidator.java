@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PasswordValidator {
     public boolean isValidPassword(String password) {
-        if (password == null || password.length() < 8) {
-            return false; // Check for minimum length
+        if (password == null || password.length() < 8 || password.length() > 30) {
+            return false;
         }
 
         boolean hasLowerCase = false;
