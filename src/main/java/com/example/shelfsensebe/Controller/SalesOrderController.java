@@ -36,8 +36,8 @@ public class SalesOrderController {
         return ResponseEntity.ok(savedSalesOrder);
     }
 
-    @DeleteMapping("/salesOrders")
-    public ResponseEntity<Void> deleteSalesOrder(@Valid @RequestBody int id, HttpSession session) {
+    @DeleteMapping("/salesOrders/{id}")
+    public ResponseEntity<Void> deleteSalesOrder(@Valid @PathVariable int id, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
