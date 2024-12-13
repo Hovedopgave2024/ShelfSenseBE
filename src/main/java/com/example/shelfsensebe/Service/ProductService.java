@@ -9,8 +9,10 @@ import com.example.shelfsensebe.Repository.ProductComponentRepository;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,14 +34,14 @@ public class ProductService
     TextSanitizer textSanitizer;
 
     public void validateOwnership(UserDTO userDTO, Product product) {
-        if (userDTO == null || product == null || product.getUser().getId() != userDTO.getId()) {
+        if (userDTO == null || product == null) {
             throw new IllegalArgumentException("Unauthorized access: You do not own this product.");
         }
     }
 
     public void deleteProduct(int id, UserDTO userDTO) {
         Product product = productRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Component not found")
+                new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found")
         );
         validateOwnership(userDTO, product);
         productRepository.delete(product);
@@ -49,10 +51,12 @@ public class ProductService
     public Product updateProduct(Product updatedProduct) {
         // Fetch the existing product from the database
         Product existingProduct = productRepository.findById(updatedProduct.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found")
+                );
 
         if (updatedProduct.getName() == null || updatedProduct.getName().isEmpty()) {
-            throw new IllegalArgumentException("Product name cannot be null or empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product name cannot be null or empty");
         }
 
         // update product
@@ -90,7 +94,8 @@ public class ProductService
 
                     if (existingComponentId != updatedComponentId) {
                         Component newComponent = componentRepository.findById(updatedPC.getComponentId())
-                                .orElseThrow(() -> new IllegalArgumentException("Component not found for ID: " + updatedPC.getComponentId()));
+                                .orElseThrow(() ->
+                                        new ResponseStatusException(HttpStatus.BAD_REQUEST, "Component not found for ID: " + updatedPC.getComponentId()));
                         existingPC.setComponent(newComponent);
                     }
 

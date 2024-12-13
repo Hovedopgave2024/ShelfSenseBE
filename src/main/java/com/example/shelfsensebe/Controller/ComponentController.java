@@ -38,33 +38,33 @@ public class ComponentController {
     }
 
     @PostMapping("/components")
-    public ResponseEntity<Component> createComponent(@Valid @RequestBody Component component, HttpSession session) {
-        UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        public ResponseEntity<Component> createComponent(@Valid @RequestBody Component component, HttpSession session) {
+            UserDTO userDTO = (UserDTO) session.getAttribute("user");
+            if (userDTO == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            Component savedComponent = componentService.createComponent(component, userDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
         }
-        Component savedComponent = componentService.createComponent(component, userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedComponent);
-    }
 
-    @PutMapping("/components/{id}")
-    public ResponseEntity<Component> updateComponent(@Valid @PathVariable int id, @RequestBody Component updatedComponent, HttpSession session) {
-        UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        @PutMapping("/components/{id}")
+        public ResponseEntity<Component> updateComponent(@Valid @PathVariable int id, @RequestBody Component updatedComponent, HttpSession session) {
+            UserDTO userDTO = (UserDTO) session.getAttribute("user");
+            if (userDTO == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            Component savedComponent = componentService.updateComponent(id, updatedComponent, userDTO);
+            return ResponseEntity.ok(savedComponent);
         }
-        Component savedComponent = componentService.updateComponent(id, updatedComponent, userDTO);
-        return ResponseEntity.ok(savedComponent);
-    }
 
-    @DeleteMapping("/components/{id}")
-    public ResponseEntity<Void> deleteComponent(@PathVariable int id, HttpSession session) {
-        UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        componentService.deleteComponent(id, userDTO);
-        return ResponseEntity.noContent().build();
+        @DeleteMapping("/components/{id}")
+        public ResponseEntity<Void> deleteComponent(@PathVariable int id, HttpSession session) {
+            UserDTO userDTO = (UserDTO) session.getAttribute("user");
+            if (userDTO == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            componentService.deleteComponent(id, userDTO);
+            return ResponseEntity.noContent().build();
     }
 
     @PostMapping("components/mouser")

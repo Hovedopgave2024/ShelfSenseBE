@@ -25,8 +25,10 @@ public class ComponentService
 
     @Autowired
     private WebClient webClient;
+
     @Autowired
     private StatusCalculator statusCalculator;
+
     @Autowired
     private TextSanitizer textSanitizer;
 
