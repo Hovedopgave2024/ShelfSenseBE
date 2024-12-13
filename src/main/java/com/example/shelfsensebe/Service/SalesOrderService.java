@@ -25,7 +25,7 @@ public class SalesOrderService {
         user.setId(userDTO.getId());
 
         salesOrder.setUser(user);
-        salesOrder.setCreatedDate(Date.valueOf(java.time.LocalDate.now()));
+        salesOrder.setCreatedDate(salesOrder.getCreatedDate());
         salesOrder.setPrice(salesOrder.getPrice());
         salesOrder.setQuantity(salesOrder.getQuantity());
         salesOrder.setProductId(salesOrder.getProductId());
@@ -49,6 +49,7 @@ public class SalesOrderService {
         existingSalesOrder.setQuantity(salesOrder.getQuantity());
         existingSalesOrder.setPrice(salesOrder.getPrice());
         existingSalesOrder.setProductId(salesOrder.getProductId());
+        existingSalesOrder.setCreatedDate(salesOrder.getCreatedDate());
 
         productRepository.findById(salesOrder.getProductId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found")

@@ -32,8 +32,6 @@ public class ApiUpdateService {
         // Update the lastUpdated field with the current time
         apiUpdate.setLastUpdated(LocalDateTime.now());
 
-        System.out.println(apiUpdate);
-
         // Save to the database
         apiUpdateRepository.save(apiUpdate);
     }

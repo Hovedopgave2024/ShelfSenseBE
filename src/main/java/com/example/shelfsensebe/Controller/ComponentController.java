@@ -77,7 +77,6 @@ public class ComponentController {
         }
         try {
             List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
-            System.out.println(updatedComponents);
             apiUpdateService.updateApiLastUpdated(userDTO.getId());
             return ResponseEntity.ok(updatedComponents);
         } catch (Exception e) {
