@@ -1,7 +1,6 @@
 package com.example.shelfsensebe.Service;
 
 import com.example.shelfsensebe.DTO.UserDTO;
-import com.example.shelfsensebe.Model.Product;
 import com.example.shelfsensebe.Model.SalesOrder;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ProductRepository;

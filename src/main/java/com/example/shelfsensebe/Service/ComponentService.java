@@ -7,7 +7,6 @@ import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.utility.StatusCalculator;
 import com.example.shelfsensebe.utility.TextSanitizer;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

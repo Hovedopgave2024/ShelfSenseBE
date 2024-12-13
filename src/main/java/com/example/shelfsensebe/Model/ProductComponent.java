@@ -3,7 +3,6 @@ package com.example.shelfsensebe.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
