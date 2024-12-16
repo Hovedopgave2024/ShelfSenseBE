@@ -94,7 +94,7 @@ public class Component
 
     @JsonBackReference("user-componentList")
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @JsonProperty("userId")

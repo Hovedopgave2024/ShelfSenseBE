@@ -35,9 +35,12 @@ public class SalesOrder
     @Min(1)
     private int productId;
 
+    @Column(name = "product_name", nullable = false)
+    private String productName;
+
     @JsonBackReference("user-salesOrderList")
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @JsonProperty("userId")
