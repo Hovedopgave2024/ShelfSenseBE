@@ -14,6 +14,9 @@ public class ProductComponentService
     private ProductComponentRepository productComponentRepository;
 
     public List<ProductComponent> saveProductComponents(List<ProductComponent> productComponents) {
+        productComponents.forEach(productComponent -> {
+            productComponent.setQuantity(productComponent.getQuantity());
+        });
         return productComponentRepository.saveAll(productComponents);
     }
 }

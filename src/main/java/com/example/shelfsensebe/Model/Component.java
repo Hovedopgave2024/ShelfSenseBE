@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,36 +34,45 @@ public class Component
     private String manufacturerPart;
 
     @Column(name = "price", nullable = false)
+    @Min(0)
     private double price;
 
     @Column(name = "supplier", nullable = false)
     private String supplier;
 
     @Column(name = "stock", nullable = false)
+    @Min(0)
     private int stock;
 
     @Column(name = "safety_stock", nullable = false)
+    @Min(0)
     private int safetyStock;
 
     @Column(name = "safety_stock_rop", nullable = false)
+    @Min(0)
     private int safetyStockRop;
 
     @Column(name = "stock_status", nullable = false)
     private int stockStatus;
 
     @Column(name = "supplier_stock")
+    @Min(0)
     private Integer supplierStock;
 
     @Column(name = "supplier_safety_stock")
+    @Min(0)
     private Integer supplierSafetyStock;
 
     @Column(name = "supplier_safety_stock_rop")
+    @Min(0)
     private Integer supplierSafetyStockRop;
 
     @Column(name = "supplier_stock_status")
+    @Min(0)
     private Integer supplierStockStatus;
 
     @Column(name = "supplier_incoming_stock")
+    @Min(0)
     private Integer supplierIncomingStock;
 
     @Column(name = "supplier_incoming_date")

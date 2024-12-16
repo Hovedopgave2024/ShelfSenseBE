@@ -1,11 +1,11 @@
 package com.example.shelfsensebe.Controller;
 
 import com.example.shelfsensebe.DTO.UserDTO;
-import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.ProductComponent;
 import com.example.shelfsensebe.Repository.ProductComponentRepository;
 import com.example.shelfsensebe.Service.ProductComponentService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +32,12 @@ public class ProductComponentController
     }
 
     @PostMapping("/productComponents")
-    public ResponseEntity<List<ProductComponent>> addProductComponents(@RequestBody List<ProductComponent> productComponents, HttpSession session) {
+    public ResponseEntity<List<ProductComponent>> addProductComponents(@Valid @RequestBody List<ProductComponent> productComponents, HttpSession session) {
 
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         List<ProductComponent> savedProductComponents = productComponentService.saveProductComponents(productComponents);
 
         return ResponseEntity.ok(savedProductComponents);
