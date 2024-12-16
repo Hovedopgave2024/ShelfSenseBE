@@ -3,9 +3,8 @@ package com.example.shelfsensebe.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import lombok.Data;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,10 +28,11 @@ public class SalesOrder
     private double price;
 
     @Column(name = "created_date", nullable = false)
+    @PastOrPresent
     private Date createdDate;
 
     @Column(name = "product_id", nullable = false)
-    @Min(0)
+    @Min(1)
     private int productId;
 
     @JsonBackReference("user-salesOrderList")

@@ -1,6 +1,5 @@
 package com.example.shelfsensebe.utility;
 
-import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Component;
 
 @Component

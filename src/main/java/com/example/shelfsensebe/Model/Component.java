@@ -5,12 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 
 import java.sql.Date;
 import java.util.List;
