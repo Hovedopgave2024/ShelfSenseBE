@@ -22,7 +22,7 @@ public class ProductComponent
 
     @JsonBackReference("product-productComponentList")
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @JsonProperty("productId")
@@ -32,7 +32,7 @@ public class ProductComponent
 
     @JsonBackReference("component-productComponentList")
     @ManyToOne
-    @JoinColumn(name = "component_id")
+    @JoinColumn(name = "component_id", nullable = false)
     private Component component;
 
     @Transient
@@ -40,7 +40,6 @@ public class ProductComponent
 
     @JsonProperty("componentId")
     public Integer getComponentId() {
-        // Use componentId from the frontend if set, otherwise fallback to component.getId()
         return (componentId != null) ? componentId : (component != null ? component.getId() : null);
     }
 
