@@ -81,7 +81,7 @@ public class Component
     @Column(name = "designator")
     private String designator;
 
-    @Column(name = "manufacturer")
+    @Column(name = "manufacturer", nullable = false)
     private String manufacturer;
 
     @Column(name = "supplier_part")
