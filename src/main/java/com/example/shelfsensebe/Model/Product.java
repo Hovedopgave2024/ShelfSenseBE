@@ -41,4 +41,15 @@ public class Product
     public Integer getUserId() {
         return user != null ? user.getId() : null;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", productComponentList=" + (productComponentList != null ? productComponentList : "[]") +
+                '}';
+    }
+
 }

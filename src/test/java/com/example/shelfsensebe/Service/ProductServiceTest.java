@@ -135,10 +135,22 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void testUpdateProduct_FlowVerification() {
+    public void testUpdateProductById_Returns_UpdatedProduct() {
         // Arrange
         Product existingProduct = getExistingProduct();
         Product updatedProduct = getUpdatedProduct();
+
+        // Define controlled lists
+        List<ProductComponent> productComponentsToUpdate = new ArrayList<>();
+        List<ProductComponent> productComponentsToAdd = new ArrayList<>();
+        List<ProductComponent> productComponentsToDelete = new ArrayList<>();
+
+        // Populate these lists as per the expected service behavior
+        productComponentsToUpdate.add(existingProduct.getProductComponentList().get(0)); // Updated component
+        productComponentsToUpdate.add(existingProduct.getProductComponentList().get(1)); // Updated component
+        productComponentsToAdd.add(updatedProduct.getProductComponentList().get(2));    // Added component
+        productComponentsToDelete.add(existingProduct.getProductComponentList().get(2)); // Deleted component
+
 
         // Mock repository and sanitizer behavior
         when(productRepository.findById(existingProduct.getId()))
@@ -155,45 +167,53 @@ public class ProductServiceTest {
         when(componentRepository.findById(4))
                 .thenReturn(Optional.of(updatedProduct.getProductComponentList().get(2).getComponent()));
 
-        // Mock saveAll behavior
-        when(productComponentRepository.saveAll(anyList())).thenAnswer(invocation -> {
-            List<ProductComponent> components = invocation.getArgument(0);
-            for (ProductComponent component : components) {
+        // Mock deleteAll for productComponentsToDelete
+        doAnswer(invocation -> {
+            List<ProductComponent> passedComponents = invocation.getArgument(0);
+            System.out.println("Components to Delete: " + passedComponents);
+            assertEquals(productComponentsToDelete, passedComponents); // Ensure exact match
+            return null; // Void method requires null
+        }).when(productComponentRepository).deleteAll(productComponentsToDelete);
+
+        // Mock saveAll for productComponentsToUpdate
+        doAnswer(invocation -> {
+            List<ProductComponent> passedComponents = invocation.getArgument(0);
+            System.out.println("Components to Update: " + passedComponents);
+            assertEquals(productComponentsToUpdate, passedComponents); // Ensure exact match
+            return passedComponents;
+        }).when(productComponentRepository).saveAll(productComponentsToUpdate);
+
+        // Mock saveAll for productComponentsToAdd
+        doAnswer(invocation -> {
+            List<ProductComponent> passedComponents = invocation.getArgument(0);
+            for (ProductComponent component : passedComponents) {
                 if (component.getId() == 0) {
                     component.setId(4);
                 }
             }
-            return components;
-        });
+            System.out.println("Components to Add: " + passedComponents);
+            assertEquals(productComponentsToAdd, passedComponents); // Ensure exact match
+            return passedComponents;
+        }).when(productComponentRepository).saveAll(productComponentsToAdd);
 
         // Act
-        productService.updateProduct(updatedProduct);
+        Product resultProduct = productService.updateProduct(updatedProduct);
 
-        // Capture arguments for deleteAll and saveAll calls
-        ArgumentCaptor<List<ProductComponent>> deleteCaptor = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<List<ProductComponent>> saveCaptor = ArgumentCaptor.forClass(List.class);
+        // Assert final product state
+        assertEquals("Updated Product", existingProduct.getName());
+        assertEquals(100.0, existingProduct.getPrice());
 
-        // Verify deleteAll
-        verify(productComponentRepository, times(1)).deleteAll(deleteCaptor.capture());
-        List<ProductComponent> deletedComponents = deleteCaptor.getValue();
-        assertEquals(1, deletedComponents.size());
-        assertEquals(3, deletedComponents.get(0).getId()); // Deleted component ID
+        // Verify interactions
+        verify(productComponentRepository, times(1)).deleteAll(productComponentsToDelete);
+        verify(productComponentRepository, times(1)).saveAll(productComponentsToUpdate);
+        verify(productComponentRepository, times(1)).saveAll(productComponentsToAdd);
+        verify(productRepository, times(1)).save(existingProduct);
 
-        // Verify saveAll for updates
-        verify(productComponentRepository, times(2)).saveAll(saveCaptor.capture());
-        List<List<ProductComponent>> saveAllArguments = saveCaptor.getAllValues();
+        assertEquals(4, productComponentsToAdd.get(0).getId());
+        assertEquals(7, productComponentsToUpdate.get(0).getQuantity());
+        assertEquals(3, productComponentsToDelete.get(0).getId());
+        assertEquals(existingProduct, resultProduct);
 
-        // First call to saveAll (updates)
-        List<ProductComponent> updatedComponents = saveAllArguments.get(0);
-        assertEquals(2, updatedComponents.size());
-        assertEquals(1, updatedComponents.get(0).getId()); // Updated component ID
-        assertEquals(2, updatedComponents.get(1).getId());
-        assertEquals(7, updatedComponents.get(0).getQuantity()); // Updated quantity
-
-        // Second call to saveAll (adds)
-        List<ProductComponent> addedComponents = saveAllArguments.get(1);
-        assertEquals(1, addedComponents.size());
-        assertEquals(4, addedComponents.get(0).getId()); // Added component ID
-        assertEquals(100, addedComponents.get(0).getQuantity()); // Added quantity
+        System.out.println("Test testUpdateProductById_Returns_401_Unauthorized passed successfully.");
     }
 }
