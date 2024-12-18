@@ -41,5 +41,4 @@ public class Product
     public Integer getUserId() {
         return user != null ? user.getId() : null;
     }
-
 }
