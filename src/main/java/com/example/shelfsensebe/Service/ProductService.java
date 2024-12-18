@@ -133,6 +133,7 @@ public class ProductService
         existingProductComponents.addAll(productComponentsToAdd);
 
         // Save the updated product
-        return productRepository.save(existingProduct);
+        productRepository.save(existingProduct);
+        return existingProduct;
     }
 }

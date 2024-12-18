@@ -82,6 +82,7 @@ public class ProductController {
 
         try {
             Product savedProduct = productService.updateProduct(updatedProduct);
+            System.out.println(savedProduct.getName() + " hello " + savedProduct.getPrice());
             return ResponseEntity.ok(savedProduct);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
