@@ -28,8 +28,9 @@ public class Product
     private String name;
 
     @Column(name = "price", nullable = false)
+    @NotNull
     @Min(0)
-    private double price;
+    private Double price;
 
     @JsonManagedReference("product-productComponentList")
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
