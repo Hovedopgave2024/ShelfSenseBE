@@ -134,6 +134,7 @@ public class ProductService
 
         // Save the updated product
         productRepository.save(existingProduct);
+
         return existingProduct;
     }
 }
