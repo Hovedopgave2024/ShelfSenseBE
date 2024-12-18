@@ -214,6 +214,6 @@ public class ProductServiceTest {
         assertEquals(3, productComponentsToDelete.get(0).getId());
         assertEquals(existingProduct, resultProduct);
 
-        System.out.println("Test testUpdateProductById_Returns_401_Unauthorized passed successfully.");
+        System.out.println("Test testUpdateProductById_Returns_UpdatedProduct passed successfully.");
     }
 }
