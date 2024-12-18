@@ -1,5 +1,4 @@
 package com.example.shelfsensebe.Controller;
-
 import com.example.shelfsensebe.DTO.UpdateUserDTO;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.User;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 
 @RestController
@@ -94,14 +92,12 @@ public class UserController
         return ResponseEntity.ok(updatedUser);
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok().build();
     }
 
-    // Checking if session is active
     @GetMapping("/session")
     public ResponseEntity<UserDTO> sessionStatus(HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");

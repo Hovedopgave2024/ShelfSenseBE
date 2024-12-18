@@ -30,6 +30,9 @@ public class Component
     @Column(name = "footprint", nullable = false)
     private String footprint;
 
+    @Column(name = "manufacturer", nullable = false)
+    private String manufacturer;
+
     @Column(name = "manufacturer_part", nullable = false)
     private String manufacturerPart;
 
@@ -80,9 +83,6 @@ public class Component
 
     @Column(name = "designator")
     private String designator;
-
-    @Column(name = "manufacturer")
-    private String manufacturer;
 
     @Column(name = "supplier_part")
     private String supplierPart;
