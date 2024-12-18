@@ -55,10 +55,6 @@ public class ProductService
                         new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found")
                 );
 
-        if (updatedProduct.getName() == null || updatedProduct.getName().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product name cannot be null or empty");
-        }
-
         // update product
         existingProduct.setName(textSanitizer.sanitize(updatedProduct.getName()));
         existingProduct.setPrice(updatedProduct.getPrice());
