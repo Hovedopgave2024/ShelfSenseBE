@@ -252,10 +252,10 @@ public class ProductServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("400 BAD_REQUEST \"Product not found\"", exception.getMessage());
 
-        verify(productComponentRepository, times(0)).deleteAll(productComponentsToDelete);
-        verify(productComponentRepository, times(0)).saveAll(productComponentsToUpdate);
-        verify(productComponentRepository, times(0)).saveAll(productComponentsToAdd);
-        verify(productRepository, times(0)).save(existingProduct);
+        verify(productComponentRepository, never()).deleteAll(productComponentsToDelete);
+        verify(productComponentRepository, never()).saveAll(productComponentsToUpdate);
+        verify(productComponentRepository, never()).saveAll(productComponentsToAdd);
+        verify(productRepository, never()).save(existingProduct);
 
         System.out.println("Test testUpdateProductById_Returns_400_BadRequest passed successfully.");
     }

@@ -80,6 +80,7 @@ public class ComponentController {
             apiUpdateService.updateApiLastUpdated(userDTO.getId());
             return ResponseEntity.ok(updatedComponents);
         } catch (Exception e) {
+            System.out.println("error fetching api: " + e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
