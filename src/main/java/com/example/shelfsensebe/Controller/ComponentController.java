@@ -75,13 +75,10 @@ public class ComponentController {
         if (userDTO == null || userDTO.getId() != userId) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        try {
             List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
+            System.out.println("inside controller in the end");
             apiUpdateService.updateApiLastUpdated(userDTO.getId());
             return ResponseEntity.ok(updatedComponents);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
     }
 
 }

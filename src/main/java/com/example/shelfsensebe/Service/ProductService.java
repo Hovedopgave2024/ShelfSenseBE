@@ -55,10 +55,6 @@ public class ProductService
                         new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found")
                 );
 
-        if (updatedProduct.getName() == null || updatedProduct.getName().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product name cannot be null or empty");
-        }
-
         // update product
         existingProduct.setName(textSanitizer.sanitize(updatedProduct.getName()));
         existingProduct.setPrice(updatedProduct.getPrice());
@@ -118,7 +114,7 @@ public class ProductService
         for (ProductComponent newPC : updatedProductComponents) {
             if (newPC.getComponentId() != null) {
                 Component component = componentRepository.findById(newPC.getComponentId())
-                        .orElseThrow(() -> new IllegalArgumentException("Component not found for ID: " + newPC.getComponentId()));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Component not found for ID: " + newPC.getComponentId()));
                 newPC.setComponent(component);
             } else {
                 throw new IllegalArgumentException("New ProductComponent must have a valid componentId");
@@ -133,6 +129,8 @@ public class ProductService
         existingProductComponents.addAll(productComponentsToAdd);
 
         // Save the updated product
-        return productRepository.save(existingProduct);
+        productRepository.save(existingProduct);
+
+        return existingProduct;
     }
 }

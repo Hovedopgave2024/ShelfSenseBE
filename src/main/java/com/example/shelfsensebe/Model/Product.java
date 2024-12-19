@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,11 +23,14 @@ public class Product
     private int id;
 
     @Column(name = "name", nullable = false)
+    @NotNull
+    @NotEmpty
     private String name;
 
     @Column(name = "price", nullable = false)
+    @NotNull
     @Min(0)
-    private double price;
+    private Double price;
 
     @JsonManagedReference("product-productComponentList")
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -40,6 +45,16 @@ public class Product
     @JsonProperty("userId")
     public Integer getUserId() {
         return user != null ? user.getId() : null;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", productComponentList=" + (productComponentList != null ? productComponentList : "[]") +
+                '}';
     }
 
 }

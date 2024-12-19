@@ -43,4 +43,12 @@ public class ProductComponent
         return (componentId != null) ? componentId : (component != null ? component.getId() : null);
     }
 
+    @Override
+    public String toString() {
+        return "ProductComponent{" +
+                "id=" + id +
+                ", quantity=" + quantity +
+                ", componentId=" + (component != null ? component.getId() : "null") +
+                '}';
+    }
 }

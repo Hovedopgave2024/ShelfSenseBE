@@ -138,21 +138,33 @@ public class ComponentService
                         .bodyToMono(MouserResponseDTO.class)
                         .block();
 
-                if (apiResponse != null && apiResponse.getErrors() != null && !apiResponse.getErrors().isEmpty()) {
-                    throw new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST,
-                            "API Errors: " + String.join(", ", apiResponse.getErrors())
-                    );
-                }
-
-                SearchResultDTO searchResults = apiResponse.getSearchResults();
-
-                if (searchResults == null || searchResults.getParts() == null || searchResults.getParts().isEmpty()) {
+                if (apiResponse == null) {
+                    System.out.println("No search results for component ID: " + component.getId());
+                    // Log right before throwing the exception
+                    System.out.println("Throwing 400: No search results found for component: " + component.getId());
                     throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
                             "No search results found for component: " + component.getId()
                     );
                 }
+
+                if (apiResponse.getErrors() != null && !apiResponse.getErrors().isEmpty()) {
+                    StringBuilder errorMessages = new StringBuilder();
+
+                    for (ErrorDTO error : apiResponse.getErrors()) {
+                        errorMessages.append("Error Code: ").append(error.getCode())
+                                .append(", Message: ").append(error.getMessage())
+                                .append(", Property: ").append(error.getPropertyName())
+                                .append("\n");
+                    }
+                    System.out.println("API Errors: \n" + errorMessages);
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "API Errors: \n" + errorMessages
+                    );
+                }
+
+                SearchResultDTO searchResults = apiResponse.getSearchResults();
 
                 PartDTO part = searchResults.getParts().get(0);
                 if (part.getAvailabilityInStock() > 0) {
@@ -178,12 +190,16 @@ public class ComponentService
                 componentRepository.save(component);
                 updatedComponents.add(component);
 
-            } catch(Exception e) {
-                throw new ResponseStatusException(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Error processing component: " + component.getId(),
-                        e
-                );
+            } catch (ResponseStatusException e) {
+                // Catch and log the ResponseStatusException explicitly
+                System.out.println("Caught ResponseStatusException: " + e.getStatusCode() + " " + e.getReason());
+                // Ensure we do not alter the exception and status
+                throw e;
+
+            } catch (Exception e) {
+                // Handle unexpected exceptions and ensure they lead to a 500
+                System.out.println("Caught unexpected exception: " + e);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", e);
             }
         });
 
