@@ -113,11 +113,16 @@ public class ComponentService
     }
 
     public List<Component> fetchAndUpdateComponentsWithSupplierInfo(String apiKey, int userId) {
-        // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
+        System.out.println("Starting fetchAndUpdateComponentsWithSupplierInfo...");
+        System.out.println("API Key: " + apiKey + ", User ID: " + userId);
+
         List<Component> components = componentRepository.findBySupplierAndUser_Id("Mouser", userId);
+        System.out.println("Found " + components.size() + " components for user ID: " + userId);
+
         List<Component> updatedComponents = new ArrayList<>();
 
         components.forEach(component -> {
+            System.out.println("Processing component with ID: " + component.getId());
             try {
                 SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
                         component.getManufacturer(),
@@ -127,7 +132,10 @@ public class ComponentService
                         "",   // searchOptions
                         ""    // searchWithYourSignUpLanguage
                 );
+                System.out.println("Constructed keywordRequest: " + keywordRequest);
+
                 SearchByKeywordRequestBodyDTO requestBody = new SearchByKeywordRequestBodyDTO(keywordRequest);
+                System.out.println("Constructed requestBody: " + requestBody);
 
                 MouserResponseDTO apiResponse = webClient.post()
                         .uri(uriBuilder -> uriBuilder.path("/search/keywordandmanufacturer")
@@ -138,7 +146,10 @@ public class ComponentService
                         .bodyToMono(MouserResponseDTO.class)
                         .block();
 
+                System.out.println("API response received: " + apiResponse);
+
                 if (apiResponse != null && apiResponse.getErrors() != null && !apiResponse.getErrors().isEmpty()) {
+                    System.out.println("API Errors: " + apiResponse.getErrors());
                     throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
                             "API Errors: " + String.join(", ", apiResponse.getErrors())
@@ -146,8 +157,10 @@ public class ComponentService
                 }
 
                 SearchResultDTO searchResults = apiResponse.getSearchResults();
+                System.out.println("Search results: " + searchResults);
 
                 if (searchResults == null || searchResults.getParts() == null || searchResults.getParts().isEmpty()) {
+                    System.out.println("No search results for component ID: " + component.getId());
                     throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
                             "No search results found for component: " + component.getId()
@@ -155,16 +168,21 @@ public class ComponentService
                 }
 
                 PartDTO part = searchResults.getParts().get(0);
+                System.out.println("Processing part: " + part);
+
                 if (part.getAvailabilityInStock() > 0) {
                     component.setSupplierStock(part.getAvailabilityInStock());
+                    System.out.println("Supplier stock updated: " + part.getAvailabilityInStock());
                 } else {
                     component.setSupplierStock(null);
                 }
+
                 List<AvailabilityOnOrderDTO> availabilityOnOrder = part.getAvailabilityOnOrder();
                 if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
                     AvailabilityOnOrderDTO firstOrder = availabilityOnOrder.get(0);
                     component.setSupplierIncomingStock(firstOrder.getQuantity());
                     component.setSupplierIncomingDate(firstOrder.getDate());
+                    System.out.println("Incoming stock: " + firstOrder.getQuantity() + ", Date: " + firstOrder.getDate());
                 } else {
                     component.setSupplierIncomingStock(null);
                     component.setSupplierIncomingDate(null);
@@ -175,10 +193,16 @@ public class ComponentService
                         component.getSupplierSafetyStock(),
                         component.getSupplierSafetyStockRop()
                 ));
+                System.out.println("Stock status updated for component ID: " + component.getId());
+
                 componentRepository.save(component);
+                System.out.println("Component saved: " + component);
+
                 updatedComponents.add(component);
 
-            } catch(Exception e) {
+            } catch (Exception e) {
+                System.out.println("Error processing component ID: " + component.getId());
+                System.out.println("An error occurred: " + e);
                 throw new ResponseStatusException(
                         HttpStatus.INTERNAL_SERVER_ERROR,
                         "Error processing component: " + component.getId(),
@@ -187,7 +211,7 @@ public class ComponentService
             }
         });
 
+        System.out.println("Completed processing all components.");
         return updatedComponents;
     }
-
 }

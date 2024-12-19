@@ -97,14 +97,37 @@ public class ComponentServiceTest {
         int userId = 1;
 
         Component mockComponent = getExistingComponent();
-        when(componentRepository.findBySupplierAndUser_Id("Mouser", userId))
+        when(componentRepository.findBySupplierAndUser_Id(eq("Mouser"), eq(userId)))
                 .thenReturn(List.of(mockComponent));
 
-        SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
-                "Siemens", "6ED10521CC080BA2", 1, 0, "", ""
+        SearchByKeywordRequestBodyDTO expectedRequestBody = new SearchByKeywordRequestBodyDTO(
+                new SearchByKeywordMfrNameRequestDTO(
+                        "Siemens",              // component.getManufacturer()
+                        "6ED10521CC080BA2",     // component.getManufacturerPart()
+                        1,                      // records
+                        0,                      // pageNumber
+                        "",                     // searchOptions
+                        ""                      // searchWithYourSignUpLanguage
+                )
         );
 
-        SearchByKeywordRequestBodyDTO requestBody = new SearchByKeywordRequestBodyDTO(keywordRequest);
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(any(Function.class))).thenReturn(requestBodySpec);
+
+        when(requestBodySpec.bodyValue(any())).thenAnswer(invocation -> {
+            Object argument = invocation.getArgument(0);
+
+            if (argument instanceof SearchByKeywordRequestBodyDTO requestBody) {
+                System.out.println("bodyValue() called with: " + requestBody);
+                // Optionally validate specific fields if needed
+                assertEquals(expectedRequestBody.getSearchByKeywordMfrNameRequest().getManufacturerName(),
+                        requestBody.getSearchByKeywordMfrNameRequest().getManufacturerName());
+            }
+
+            return requestHeadersSpec;
+        });
+
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
 
         MouserResponseDTO mockApiResponse = new MouserResponseDTO(
                 Collections.emptyList(),
@@ -119,10 +142,6 @@ public class ComponentServiceTest {
                 )
         );
 
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(any(Function.class))).thenReturn(requestBodySpec);
-        when(requestBodySpec.bodyValue(any(SearchByKeywordRequestBodyDTO.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(MouserResponseDTO.class)).thenReturn(Mono.just(mockApiResponse));
 
         when(statusCalculator.calculateStatus(16, 5, 3)).thenReturn(4);
