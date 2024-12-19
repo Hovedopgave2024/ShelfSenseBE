@@ -56,7 +56,7 @@ public class ProductServiceTest {
     private Product getUpdatedProduct() {
         Product updatedProduct = new Product();
         updatedProduct.setId(1);
-        updatedProduct.setName("Updated Product");
+        updatedProduct.setName("<&'>Updated Product<&'>");
         updatedProduct.setPrice(100.0);
 
         Component component1 = new Component();
@@ -151,12 +151,11 @@ public class ProductServiceTest {
         productComponentsToAdd.add(updatedProduct.getProductComponentList().get(2));    // Added component
         productComponentsToDelete.add(existingProduct.getProductComponentList().get(2)); // Deleted component
 
-
         // Mock repository and sanitizer behavior
         when(productRepository.findById(existingProduct.getId()))
                 .thenReturn(Optional.of(existingProduct));
         when(textSanitizer.sanitize(updatedProduct.getName()))
-                .thenReturn(updatedProduct.getName());
+                .thenReturn("Updated Product");
 
         when(componentRepository.findById(1))
                 .thenReturn(Optional.of(existingProduct.getProductComponentList().get(0).getComponent()));
@@ -167,11 +166,15 @@ public class ProductServiceTest {
         when(componentRepository.findById(4))
                 .thenReturn(Optional.of(updatedProduct.getProductComponentList().get(2).getComponent()));
 
+        // These passedComponents comes in a specific order from the service class, which is:
+        // 1. componentsToDelete, 2. componentsToUpdate, 3. componentsToAdd.
+        // That's why we can use passedComponents because we know the flow of the expected components.
+
         // Mock deleteAll for productComponentsToDelete
         doAnswer(invocation -> {
             List<ProductComponent> passedComponents = invocation.getArgument(0);
             System.out.println("Components to Delete: " + passedComponents);
-            assertEquals(productComponentsToDelete, passedComponents); // Ensure exact match
+            assertEquals(productComponentsToDelete, passedComponents);
             return null; // Void method requires null
         }).when(productComponentRepository).deleteAll(productComponentsToDelete);
 
@@ -179,7 +182,7 @@ public class ProductServiceTest {
         doAnswer(invocation -> {
             List<ProductComponent> passedComponents = invocation.getArgument(0);
             System.out.println("Components to Update: " + passedComponents);
-            assertEquals(productComponentsToUpdate, passedComponents); // Ensure exact match
+            assertEquals(productComponentsToUpdate, passedComponents);
             return passedComponents;
         }).when(productComponentRepository).saveAll(productComponentsToUpdate);
 
