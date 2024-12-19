@@ -114,7 +114,7 @@ public class ProductService
         for (ProductComponent newPC : updatedProductComponents) {
             if (newPC.getComponentId() != null) {
                 Component component = componentRepository.findById(newPC.getComponentId())
-                        .orElseThrow(() -> new IllegalArgumentException("Component not found for ID: " + newPC.getComponentId()));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Component not found for ID: " + newPC.getComponentId()));
                 newPC.setComponent(component);
             } else {
                 throw new IllegalArgumentException("New ProductComponent must have a valid componentId");

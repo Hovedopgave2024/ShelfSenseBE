@@ -14,13 +14,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -103,7 +104,7 @@ public class ProductServiceTest {
         existingComponent1.setId(1);
 
         Component existingComponent2 = new Component();
-        existingComponent2.setId(2);
+        existingComponent2.setId(5);
 
         Component existingComponent3 = new Component();
         existingComponent3.setId(3);
@@ -214,9 +215,48 @@ public class ProductServiceTest {
 
         assertEquals(4, productComponentsToAdd.get(0).getId());
         assertEquals(7, productComponentsToUpdate.get(0).getQuantity());
+        assertEquals(2, productComponentsToUpdate.get(1).getId());
         assertEquals(3, productComponentsToDelete.get(0).getId());
         assertEquals(existingProduct, resultProduct);
 
         System.out.println("Test testUpdateProductById_Returns_UpdatedProduct passed successfully.");
+    }
+
+    @Test
+    public void testUpdateProductById_Returns_400_BadRequest() {
+        // Arrange
+        Product existingProduct = getExistingProduct();
+        Product updatedProduct = getUpdatedProduct();
+
+        // Define controlled lists
+        List<ProductComponent> productComponentsToUpdate = new ArrayList<>();
+        List<ProductComponent> productComponentsToAdd = new ArrayList<>();
+        List<ProductComponent> productComponentsToDelete = new ArrayList<>();
+
+        // Populate these lists as per the expected service behavior
+        productComponentsToUpdate.add(existingProduct.getProductComponentList().get(0));
+
+        when(componentRepository.findById(1))
+                .thenReturn(Optional.of(existingProduct.getProductComponentList().get(0).getComponent()));
+
+        // Trying to update a component by id in a productComponent that needs to be updated.
+        when(componentRepository.findById(5))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Component not found for ID: " + 5));
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            productService.updateProduct(updatedProduct);
+        });
+
+        // Validate exception details
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("400 BAD_REQUEST \"Product not found\"", exception.getMessage());
+
+        verify(productComponentRepository, times(0)).deleteAll(productComponentsToDelete);
+        verify(productComponentRepository, times(0)).saveAll(productComponentsToUpdate);
+        verify(productComponentRepository, times(0)).saveAll(productComponentsToAdd);
+        verify(productRepository, times(0)).save(existingProduct);
+
+        System.out.println("Test testUpdateProductById_Returns_400_BadRequest passed successfully.");
     }
 }
