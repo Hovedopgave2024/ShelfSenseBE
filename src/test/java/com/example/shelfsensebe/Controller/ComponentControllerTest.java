@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Date;
 import java.util.Collections;
@@ -158,7 +159,7 @@ public class ComponentControllerTest {
     }
 
     @Test
-    public void testFetchApiAndUpdateUserComponentsData_Returns_500_OnError() {
+    public void testFetchApiAndUpdateUserComponentsData_Returns_400_OnError() {
         // Mock data setup
         String userId = "1";
         UserDTO mockUser = new UserDTO(1, "Test User");
@@ -166,24 +167,29 @@ public class ComponentControllerTest {
         // Mocking session and service behavior
         when(session.getAttribute("user")).thenReturn(mockUser);
         when(componentService.fetchAndUpdateComponentsWithSupplierInfo(null, 1))
-                .thenThrow(new RuntimeException("Simulated error fetching API"));
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "API Errors: \nError Code: Invalid, Message: Invalid unique identifier., Property: API Key"));
 
         // Creating request body
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("userId", userId);
         requestBody.put("apiKey", null); // Simulating a null apiKey to trigger the error
 
-        // Invoking the controller method
-        ResponseEntity<List<Component>> response = componentController.fetchApiAndUpdateUserComponentsData(requestBody, session);
+        // Exception expected
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            componentController.fetchApiAndUpdateUserComponentsData(requestBody, session);
+        });
 
-        // Assertions
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertNull(response.getBody());
+        // Assertions on exception
+        assertNotNull(exception);
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("API Errors: \nError Code: Invalid, Message: Invalid unique identifier., Property: API Key",
+                exception.getReason());
 
         // Verify mocks
         verify(session, times(1)).getAttribute("user");
         verify(componentService, times(1)).fetchAndUpdateComponentsWithSupplierInfo(null, 1);
 
-        System.out.println("Test testFetchApiAndUpdateUserComponentsData_Returns_500_OnError passed successfully.");
+        System.out.println("Test testFetchApiAndUpdateUserComponentsData_Returns_400_OnError passed successfully.");
     }
 }
