@@ -11,7 +11,9 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
@@ -24,8 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -91,39 +92,42 @@ public class ComponentServiceTest {
     }
 
     @Test
-    void testFetchAndUpdateComponentsWithSupplierInfo() {
+    void testFetchAndUpdateComponentsWithSupplierInfo_Returns_UpdatedComponents() {
         // Arrange
         String apiKey = "dummyApiKey";
         int userId = 1;
 
+        Component existingComponent = getExistingComponent();
+
         Component mockComponent = getExistingComponent();
-        when(componentRepository.findBySupplierAndUser_Id(eq("Mouser"), eq(userId)))
+        when(componentRepository.findBySupplierAndUser_Id(eq(existingComponent.getSupplier()), eq(userId)))
                 .thenReturn(List.of(mockComponent));
 
-        SearchByKeywordRequestBodyDTO expectedRequestBody = new SearchByKeywordRequestBodyDTO(
-                new SearchByKeywordMfrNameRequestDTO(
-                        "Siemens",              // component.getManufacturer()
-                        "6ED10521CC080BA2",     // component.getManufacturerPart()
-                        1,                      // records
-                        0,                      // pageNumber
-                        "",                     // searchOptions
-                        ""                      // searchWithYourSignUpLanguage
-                )
+        SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
+                existingComponent.getManufacturer(),       // component.getManufacturer()
+                existingComponent.getManufacturerPart(),  // component.getManufacturerPart()
+                1,                                         // records
+                0,                                         // PageNumber
+                "",                                        // searchOptions
+                ""                                         // searchWithYourSignUpLanguage
         );
 
+        SearchByKeywordRequestBodyDTO expectedRequestBody = new SearchByKeywordRequestBodyDTO(keywordRequest);
+
+        // Mock the WebClient chain
         when(webClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(any(Function.class))).thenReturn(requestBodySpec);
 
+        // Use thenAnswer() with any() to capture the argument and assert it
         when(requestBodySpec.bodyValue(any())).thenAnswer(invocation -> {
-            Object argument = invocation.getArgument(0);
+            // Directly retrieve and cast the argument passed to bodyValue()
+            SearchByKeywordRequestBodyDTO requestBody = invocation.getArgument(0);
 
-            if (argument instanceof SearchByKeywordRequestBodyDTO requestBody) {
-                System.out.println("bodyValue() called with: " + requestBody);
-                // Optionally validate specific fields if needed
-                assertEquals(expectedRequestBody.getSearchByKeywordMfrNameRequest().getManufacturerName(),
-                        requestBody.getSearchByKeywordMfrNameRequest().getManufacturerName());
-            }
+            // Perform the assertion to verify the expected value
+            assertEquals(expectedRequestBody.getSearchByKeywordMfrNameRequest().getManufacturerName(),
+                    requestBody.getSearchByKeywordMfrNameRequest().getManufacturerName());
 
+            // Return the mock response spec to continue the WebClient chain
             return requestHeadersSpec;
         });
 
@@ -163,6 +167,77 @@ public class ComponentServiceTest {
         verify(requestBodySpec, times(1)).bodyValue(any(SearchByKeywordRequestBodyDTO.class)); // Correct verify
         verify(componentRepository, times(1)).save(any(Component.class));
 
-        System.out.println("Test testFetchApiAndUpdateUserComponentsData_Returns_500_OnError passed successfully.");
+        System.out.println("Test testFetchAndUpdateComponentsWithSupplierInfo_Returns_UpdatedComponents passed successfully.");
+    }
+
+    @Test
+    void testFetchAndUpdateComponentsWithSupplierInfo_Returns_400_BadRequest() {
+        // Arrange
+        int userId = 1;
+
+        // Mock the existing component
+        Component existingComponent = getExistingComponent();
+        Component mockComponent = getExistingComponent();
+        when(componentRepository.findBySupplierAndUser_Id(eq(existingComponent.getSupplier()), eq(userId)))
+                .thenReturn(List.of(mockComponent));
+
+        // Create the keywordRequest with a null manufacturer to trigger a 400 error
+        SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
+                existingComponent.getManufacturer(),       // component.getManufacturer()
+                existingComponent.getManufacturerPart(),  // component.getManufacturerPart()
+                1,                                         // records
+                0,                                         // PageNumber
+                "",                                        // searchOptions
+                ""                                         // searchWithYourSignUpLanguage
+        );
+
+        SearchByKeywordRequestBodyDTO expectedRequestBody = new SearchByKeywordRequestBodyDTO(keywordRequest);
+
+        // Mock the WebClient chain
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(any(Function.class))).thenReturn(requestBodySpec);
+
+        // Use thenAnswer() with any() to capture the argument and assert it
+        when(requestBodySpec.bodyValue(any())).thenAnswer(invocation -> {
+            // Directly retrieve and cast the argument passed to bodyValue()
+            SearchByKeywordRequestBodyDTO requestBody = invocation.getArgument(0);
+
+            // Perform the assertion to verify the expected value
+            assertEquals(expectedRequestBody.getSearchByKeywordMfrNameRequest().getManufacturerName(),
+                    requestBody.getSearchByKeywordMfrNameRequest().getManufacturerName());
+
+            // Return the mock response spec to continue the WebClient chain
+            return requestHeadersSpec;
+        });
+
+        List<ErrorDTO> mockErrors = List.of(
+                new ErrorDTO(1, "Invalid", "Invalid unique identifier.", null, null, null, "API Key")
+        );
+
+        // Simulate an API response with errors (invalid API key)
+        MouserResponseDTO mockApiResponseWithError = new MouserResponseDTO(
+                mockErrors, // Pass the list of errors
+                null // No search results
+        );
+
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(MouserResponseDTO.class)).thenReturn(Mono.just(mockApiResponseWithError));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            // Call the service method which should throw the ResponseStatusException
+            componentService.fetchAndUpdateComponentsWithSupplierInfo(null, userId); // Simulating invalid API key
+        });
+
+        // Assert that the exception is a 400 Bad Request
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+
+        // Verify interactions
+        verify(componentRepository, times(1)).findBySupplierAndUser_Id(eq(existingComponent.getSupplier()), eq(userId));
+        verify(webClient, times(1)).post();
+        verify(requestBodySpec, times(1)).bodyValue(any(SearchByKeywordRequestBodyDTO.class));
+        verify(requestHeadersSpec, times(1)).retrieve();
+        verify(componentRepository, never()).save(any(Component.class));
+
+        System.out.println("Test testFetchAndUpdateComponentsWithSupplierInfo_Returns_400_BadRequest passed successfully.");
     }
 }
