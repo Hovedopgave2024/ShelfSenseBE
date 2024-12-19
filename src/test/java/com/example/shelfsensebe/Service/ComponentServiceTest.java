@@ -48,9 +48,6 @@ public class ComponentServiceTest {
     private WebClient webClient;
 
     @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
-
-    @Mock
     private WebClient.RequestHeadersSpec requestHeadersSpec;
 
     @Mock
@@ -171,7 +168,7 @@ public class ComponentServiceTest {
     }
 
     @Test
-    void testFetchAndUpdateComponentsWithSupplierInfo_Returns_400_BadRequest() {
+    void testFetchAndUpdateComponentsWithSupplierInfoWithMissingApiKey_Returns_400_BadRequest() {
         // Arrange
         int userId = 1;
 
@@ -210,6 +207,7 @@ public class ComponentServiceTest {
             return requestHeadersSpec;
         });
 
+        // create the expected error response
         List<ErrorDTO> mockErrors = List.of(
                 new ErrorDTO(1, "Invalid", "Invalid unique identifier.", null, null, null, "API Key")
         );
@@ -220,6 +218,7 @@ public class ComponentServiceTest {
                 null // No search results
         );
 
+        // Return the mock response and error
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(MouserResponseDTO.class)).thenReturn(Mono.just(mockApiResponseWithError));
 
@@ -238,6 +237,6 @@ public class ComponentServiceTest {
         verify(requestHeadersSpec, times(1)).retrieve();
         verify(componentRepository, never()).save(any(Component.class));
 
-        System.out.println("Test testFetchAndUpdateComponentsWithSupplierInfo_Returns_400_BadRequest passed successfully.");
+        System.out.println("Test testFetchAndUpdateComponentsWithSupplierInfoWithMissingApiKey_Returns_400_BadRequest passed successfully.");
     }
 }
