@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,18 +24,28 @@ public class Component
     private int id;
 
     @Column(name = "name", nullable = false)
+    @NotNull
+    @NotEmpty
     private String name;
 
     @Column(name = "type", nullable = false)
+    @NotNull
+    @NotEmpty
     private String type;
 
     @Column(name = "footprint", nullable = false)
+    @NotNull
+    @NotEmpty
     private String footprint;
 
     @Column(name = "manufacturer", nullable = false)
+    @NotNull
+    @NotEmpty
     private String manufacturer;
 
     @Column(name = "manufacturer_part", nullable = false)
+    @NotNull
+    @NotEmpty
     private String manufacturerPart;
 
     @Column(name = "price", nullable = false)
@@ -41,6 +53,8 @@ public class Component
     private double price;
 
     @Column(name = "supplier", nullable = false)
+    @NotNull
+    @NotEmpty
     private String supplier;
 
     @Column(name = "stock", nullable = false)
