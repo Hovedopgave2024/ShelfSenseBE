@@ -1,16 +1,15 @@
 package com.example.shelfsensebe.Service;
 
-import com.example.shelfsensebe.utility.TextSanitizer;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.Product;
 import com.example.shelfsensebe.Model.ProductComponent;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Repository.ProductComponentRepository;
 import com.example.shelfsensebe.Repository.ProductRepository;
+import com.example.shelfsensebe.utility.TextSanitizer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -21,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class ProductServiceTest {
