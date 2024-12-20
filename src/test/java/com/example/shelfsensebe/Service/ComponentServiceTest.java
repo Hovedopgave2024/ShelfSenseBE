@@ -1,32 +1,27 @@
 package com.example.shelfsensebe.Service;
+
 import com.example.shelfsensebe.DTO.MouserApiDTO.*;
-import com.example.shelfsensebe.utility.StatusCalculator;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ComponentRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.shelfsensebe.utility.StatusCalculator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
