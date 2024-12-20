@@ -3,6 +3,7 @@ package com.example.shelfsensebe.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,12 +17,13 @@ public class ApiUpdate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "last_updated")
+    @Column(name = "last_updated", nullable = false)
+    @NotNull
     private LocalDateTime lastUpdated;
 
     @JsonBackReference(value = "user-apiUpdate")
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @JsonProperty("userId")

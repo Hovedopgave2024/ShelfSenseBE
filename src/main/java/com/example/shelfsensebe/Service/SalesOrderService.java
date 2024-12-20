@@ -5,12 +5,11 @@ import com.example.shelfsensebe.Model.SalesOrder;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import com.example.shelfsensebe.Repository.SalesOrderRepository;
+import com.example.shelfsensebe.utility.TextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.sql.Date;
 
 @Service
 public class SalesOrderService {
@@ -18,7 +17,9 @@ public class SalesOrderService {
     @Autowired
     SalesOrderRepository salesOrderRepository;
     @Autowired
-    private ProductRepository productRepository;
+    ProductRepository productRepository;
+    @Autowired
+    TextSanitizer textSanitizer;
 
     public SalesOrder createSalesOrder (SalesOrder salesOrder, UserDTO userDTO) {
         User user = new User();
@@ -29,6 +30,7 @@ public class SalesOrderService {
         salesOrder.setPrice(salesOrder.getPrice());
         salesOrder.setQuantity(salesOrder.getQuantity());
         salesOrder.setProductId(salesOrder.getProductId());
+        salesOrder.setProductName(textSanitizer.sanitize(salesOrder.getProductName()));
 
         productRepository.findById(salesOrder.getProductId()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found")
@@ -49,6 +51,7 @@ public class SalesOrderService {
         existingSalesOrder.setQuantity(salesOrder.getQuantity());
         existingSalesOrder.setPrice(salesOrder.getPrice());
         existingSalesOrder.setProductId(salesOrder.getProductId());
+        existingSalesOrder.setProductName(textSanitizer.sanitize(salesOrder.getProductName()));
         existingSalesOrder.setCreatedDate(salesOrder.getCreatedDate());
 
         productRepository.findById(salesOrder.getProductId()).orElseThrow(() ->
