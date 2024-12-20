@@ -33,4 +33,4 @@ jobs:
 
       # Step 4: Build and run tests
       - name: Build and test with Maven
-        run: mvn clean test -Dspring.profiles.active=test
+        run: mvn clean test
