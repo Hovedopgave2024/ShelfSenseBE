@@ -5,14 +5,11 @@ import com.example.shelfsensebe.Model.SalesOrder;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import com.example.shelfsensebe.Repository.SalesOrderRepository;
+import com.example.shelfsensebe.utility.TextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import com.example.shelfsensebe.utility.TextSanitizer;
-import org.w3c.dom.Text;
-
-import java.sql.Date;
 
 @Service
 public class SalesOrderService {
