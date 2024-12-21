@@ -156,10 +156,10 @@ public class ComponentService
                                 .append(", Property: ").append(error.getPropertyName())
                                 .append("\n");
 
-                        if (error.getPropertyName().equals("API Key")) {
+                        if ("API Key".equals(error.getPropertyName())) {
                             throw new ResponseStatusException(
                                     HttpStatus.BAD_REQUEST,
-                                    "API key is invalid!"
+                                    "Invalid API key detected! Stopping processing."
                             );
                         }
                     }
