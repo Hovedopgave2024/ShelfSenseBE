@@ -1,0 +1,46 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Set up Java (needed for building the Maven project)
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '19'
+        distribution: 'temurin'
+
+    # Build the Maven project
+    - name: Build with Maven
+      run: mvn clean package
+
+    # Kill the process on the VM (if running)
+    - name: Kill running process
+      run: |
+        ssh -i ${{ secrets.SSH_KEY }} azureuser@168.61.83.8 "pkill -f ShelfSenseBE-0.0.1-SNAPSHOT.jar || true"
+
+    # Delete the old JAR file
+    - name: Delete old JAR file
+      run: |
+        ssh -i ${{ secrets.SSH_KEY }} azureuser@168.61.83.8 "sudo rm -f ShelfSenseBE-0.0.1-SNAPSHOT.jar"
+
+    # Upload the new JAR file
+    - name: Upload new JAR file
+      run: |
+        scp -i ${{ secrets.SSH_KEY }} target/ShelfSenseBE-0.0.1-SNAPSHOT.jar azureuser@168.61.83.8:/home/azureuser/
+
+    # Run the new JAR file
+    - name: Run new JAR file
+      run: |
+        ssh -i ${{ secrets.SSH_KEY }} azureuser@168.61.83.8 "nohup java -jar ShelfSenseBE-0.0.1-SNAPSHOT.jar"
