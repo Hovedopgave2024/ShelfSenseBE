@@ -155,12 +155,16 @@ public class ComponentService
                                 .append(", Message: ").append(error.getMessage())
                                 .append(", Property: ").append(error.getPropertyName())
                                 .append("\n");
+
+                        if ("API Key".equals(error.getPropertyName())) {
+                            throw new ResponseStatusException(
+                                    HttpStatus.BAD_REQUEST,
+                                    "Invalid API key detected! Stopping processing."
+                            );
+                        }
                     }
-                    System.out.println("API Errors: \n" + errorMessages);
-                    throw new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST,
-                            "API Errors: \n" + errorMessages
-                    );
+                    System.out.println("API Errors for component with id " + component.getId() + ": \n" + errorMessages);
+                    return;
                 }
 
                 SearchResultDTO searchResults = apiResponse.getSearchResults();
