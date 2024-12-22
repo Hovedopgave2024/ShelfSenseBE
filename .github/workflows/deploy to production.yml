@@ -50,7 +50,7 @@ jobs:
     # Kill the process on the VM (if running)
     - name: Kill running process
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "if pgrep -f ShelfSenseBE-0.0.1-SNAPSHOT.jar; then sudo pkill -f ShelfSenseBE-0.0.1-SNAPSHOT.jar && echo 'Process killed successfully' else echo 'No process found to kill' fi"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "sudo pkill -f ShelfSenseBE-0.0.1-SNAPSHOT.jar"
 
     # Delete the old JAR file
     - name: Delete old JAR file
