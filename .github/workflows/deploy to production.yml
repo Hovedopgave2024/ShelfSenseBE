@@ -48,9 +48,9 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "echo 'SSH Connection Successful'"
 
     # Kill the process on the VM (if running)
-    #- name: Kill running process
-    #  run: |
-    #    ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "sudo pkill -f ShelfSenseBE-0.0.1-SNAPSHOT.jar || true"
+    - name: Kill running process
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "sudo pkill -f ShelfSenseBE-0.0.1-SNAPSHOT.jar"
 
     # Delete the old JAR file
     - name: Delete old JAR file
@@ -65,4 +65,4 @@ jobs:
     # Run the new JAR file
     - name: Run new JAR file
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "nohup java -jar ShelfSenseBE-0.0.1-SNAPSHOT.jar &"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "nohup java -jar ShelfSenseBE-0.0.1-SNAPSHOT.jar > app.log 2>&1 & sleep 20 && pgrep -f ShelfSenseBE-0.0.1-SNAPSHOT.jar && echo 'JAR started successfully' || exit 1"
