@@ -77,11 +77,11 @@ public class Component
 
     @Column(name = "supplier_safety_stock")
     @Min(0)
-    private Integer supplierSafetyStock;
+    private int supplierSafetyStock;
 
     @Column(name = "supplier_safety_stock_rop")
     @Min(0)
-    private Integer supplierSafetyStockRop;
+    private int supplierSafetyStockRop;
 
     @Column(name = "supplier_stock_status")
     @Min(0)

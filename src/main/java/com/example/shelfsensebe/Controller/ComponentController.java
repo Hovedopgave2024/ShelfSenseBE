@@ -76,7 +76,6 @@ public class ComponentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
             List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
-            System.out.println("inside controller in the end");
             apiUpdateService.updateApiLastUpdated(userDTO.getId());
             return ResponseEntity.ok(updatedComponents);
     }
