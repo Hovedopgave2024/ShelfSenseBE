@@ -53,10 +53,11 @@ public class ComponentService
         component.setType(textSanitizer.sanitize(component.getType()));
         component.setFootprint(textSanitizer.sanitize(component.getFootprint()));
         component.setManufacturerPart(textSanitizer.sanitize(component.getManufacturerPart()));
-        component.setSupplier(textSanitizer.sanitize(component.getSupplier()));
-        component.setDesignator(textSanitizer.sanitize(component.getDesignator()));
         component.setManufacturer(textSanitizer.sanitize(component.getManufacturer()));
-        component.setSupplierPart(textSanitizer.sanitize(component.getSupplierPart()));
+        component.setSupplier(textSanitizer.sanitize(component.getSupplier()));
+        component.setDesignator(component.getDesignator() != null ? textSanitizer.sanitize(component.getDesignator()): null);
+        component.setSupplierPart(component.getSupplierPart() != null ? textSanitizer.sanitize(component.getSupplierPart()): null);
+
         return componentRepository.save(component);
     }
 
@@ -78,6 +79,7 @@ public class ComponentService
         existingComponent.setType(textSanitizer.sanitize(updatedComponent.getType()));
         existingComponent.setFootprint(textSanitizer.sanitize(updatedComponent.getFootprint()));
         existingComponent.setManufacturerPart(textSanitizer.sanitize(updatedComponent.getManufacturerPart()));
+        existingComponent.setManufacturer(textSanitizer.sanitize(updatedComponent.getManufacturer()));
         existingComponent.setPrice(updatedComponent.getPrice());
         existingComponent.setSupplier(textSanitizer.sanitize(updatedComponent.getSupplier()));
         existingComponent.setStock(updatedComponent.getStock());
@@ -85,14 +87,13 @@ public class ComponentService
         existingComponent.setSafetyStockRop(updatedComponent.getSafetyStockRop());
         existingComponent.setSupplierSafetyStock(updatedComponent.getSupplierSafetyStock());
         existingComponent.setSupplierSafetyStockRop(updatedComponent.getSupplierSafetyStockRop());
-        existingComponent.setDesignator(textSanitizer.sanitize(updatedComponent.getDesignator()));
-        existingComponent.setManufacturer(textSanitizer.sanitize(updatedComponent.getManufacturer()));
-        existingComponent.setSupplierPart(textSanitizer.sanitize(updatedComponent.getSupplierPart()));
+        existingComponent.setDesignator(updatedComponent.getDesignator() != null ? textSanitizer.sanitize(updatedComponent.getDesignator()): null);
+        existingComponent.setSupplierPart(updatedComponent.getSupplierPart() != null ? textSanitizer.sanitize(updatedComponent.getSupplierPart()): null);
 
         existingComponent.setStockStatus(statusCalculator.calculateStatus(updatedComponent.getStock(),
                 updatedComponent.getSafetyStock(), updatedComponent.getSafetyStockRop()));
 
-     if (updatedComponent.getSupplierSafetyStock() != null && updatedComponent.getSupplierSafetyStockRop() != null && existingComponent.getSupplierStock() != null)
+     if (existingComponent.getSupplierStock() != null)
      {
             existingComponent.setSupplierStockStatus(statusCalculator.calculateStatus(
                     existingComponent.getSupplierStock(),
@@ -118,8 +119,27 @@ public class ComponentService
         List<Component> components = componentRepository.findBySupplierAndUser_Id("Mouser", userId);
         List<Component> updatedComponents = new ArrayList<>();
 
-        components.forEach(component -> {
+        // Control the 30 API calls limit per minute
+        int apiCallCount = 0;
+        long lastBatchStartTime = System.currentTimeMillis();
+
+        for (Component component : components) {
             try {
+
+                if (apiCallCount > 0 && apiCallCount % 29 == 0) {
+                    long elapsedTime = System.currentTimeMillis() - lastBatchStartTime; // Time since last batch start
+                    long remainingTime = 65000 - elapsedTime; // Calculate remaining time to complete 1 minute and 5 second buffer
+
+                    System.out.println("triggered api, remaining time: " + remainingTime + " and count:" + apiCallCount);
+
+                    if (remainingTime > 0) {
+                        System.out.println("Waiting for " + remainingTime + " milliseconds...");
+                        Thread.sleep(remainingTime); // Wait only for the remaining time
+                        System.out.println("Starting api again...");
+                    }
+                    lastBatchStartTime = System.currentTimeMillis(); // Reset batch start time
+                }
+
                 SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
                         component.getManufacturer(),
                         component.getManufacturerPart(),
@@ -167,7 +187,7 @@ public class ComponentService
                         }
                     }
                     System.out.println("API Errors for component with id " + component.getId() + ": \n" + errorMessages);
-                    return;
+                    continue;
                 }
 
                 SearchResultDTO searchResults = apiResponse.getSearchResults();
@@ -196,6 +216,9 @@ public class ComponentService
                 componentRepository.save(component);
                 updatedComponents.add(component);
 
+                // Add count to api counter
+                apiCallCount++;
+
             } catch (ResponseStatusException e) {
                 // Catch and log the ResponseStatusException explicitly
                 System.out.println("Caught ResponseStatusException: " + e.getStatusCode() + " " + e.getReason());
@@ -207,7 +230,7 @@ public class ComponentService
                 System.out.println("Caught unexpected exception: " + e);
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", e);
             }
-        });
+        }
 
         return updatedComponents;
     }
