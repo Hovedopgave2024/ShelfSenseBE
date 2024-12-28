@@ -130,8 +130,6 @@ public class ComponentService
                     long elapsedTime = System.currentTimeMillis() - lastBatchStartTime; // Time since last batch start
                     long remainingTime = 65000 - elapsedTime; // Calculate remaining time to complete 1 minute and 5 second buffer
 
-                    System.out.println("triggered api, remaining time: " + remainingTime + " and count:" + apiCallCount);
-
                     if (remainingTime > 0) {
                         System.out.println("Waiting for " + remainingTime + " milliseconds...");
                         Thread.sleep(remainingTime); // Wait only for the remaining time
@@ -161,9 +159,6 @@ public class ComponentService
                         .block();
 
                 if (apiResponse == null) {
-                    System.out.println("No search results for component ID: " + component.getId());
-                    // Log right before throwing the exception
-                    System.out.println("Throwing 400: No search results found for component: " + component.getId());
                     throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
                             "No search results found for component: " + component.getId()
