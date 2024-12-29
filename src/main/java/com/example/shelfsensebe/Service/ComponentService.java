@@ -161,7 +161,7 @@ public class ComponentService
                 if (apiResponse == null) {
                     throw new ResponseStatusException(
                             HttpStatus.BAD_REQUEST,
-                            "No search results found for component: " + component.getId()
+                            "No response from the API"
                     );
                 }
 
@@ -186,6 +186,12 @@ public class ComponentService
                 }
 
                 SearchResultDTO searchResults = apiResponse.getSearchResults();
+
+                if (searchResults.getParts() == null || searchResults.getParts().isEmpty()) {
+                    System.out.println("Found no search results for component with id " + component.getId());
+                    continue;
+                }
+
 
                 PartDTO part = searchResults.getParts().get(0);
                 if (part.getAvailabilityInStock() > 0) {
