@@ -214,24 +214,24 @@ public class ComponentService
                         component.getSupplierSafetyStock(),
                         component.getSupplierSafetyStockRop()
                 ));
-                componentRepository.save(component);
                 updatedComponents.add(component);
 
                 // Add count to api counter
                 apiCallCount++;
 
             } catch (ResponseStatusException e) {
-                // Catch and log the ResponseStatusException explicitly
+                // Catch and log the ResponseStatusException
                 System.out.println("Caught ResponseStatusException: " + e.getStatusCode() + " " + e.getReason());
-                // Ensure we do not alter the exception and status
                 throw e;
 
             } catch (Exception e) {
-                // Handle unexpected exceptions and ensure they lead to a 500
+                // Handle unexpected exceptions
                 System.out.println("Caught unexpected exception: " + e);
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", e);
             }
         }
+
+        componentRepository.saveAll(updatedComponents);
 
         return updatedComponents;
     }
