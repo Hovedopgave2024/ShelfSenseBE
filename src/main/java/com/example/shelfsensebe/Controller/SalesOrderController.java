@@ -32,7 +32,7 @@ public class SalesOrderController {
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        SalesOrder savedSalesOrder = salesOrderService.updateSalesOrder(updatedSalesOrder, userDTO);
+        SalesOrder savedSalesOrder = salesOrderService.updateSalesOrder(updatedSalesOrder);
         return ResponseEntity.ok(savedSalesOrder);
     }
 
