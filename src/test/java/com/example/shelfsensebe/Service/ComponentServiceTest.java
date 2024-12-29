@@ -157,7 +157,7 @@ public class ComponentServiceTest {
         verify(componentRepository, times(1)).findBySupplierAndUser_Id("Mouser", userId); // Correct verify
         verify(webClient, times(1)).post(); // Correct verify
         verify(requestBodySpec, times(1)).bodyValue(any(SearchByKeywordRequestBodyDTO.class)); // Correct verify
-        verify(componentRepository, times(1)).save(any(Component.class));
+        verify(componentRepository, times(1)).saveAll(updatedComponents);
 
         System.out.println("Test testFetchAndUpdateComponentsWithSupplierInfo_Returns_UpdatedComponents passed successfully.");
     }
