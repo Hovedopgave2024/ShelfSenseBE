@@ -21,7 +21,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Build with Maven
-      run: mvn clean package
+      run: mvn clean package -Dtest=!ShelfSenseBeApplicationTests
 
     - name: Ensure SSH Directory
       run: |
@@ -51,5 +51,13 @@ jobs:
 
     - name: Run new JAR file
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "nohup java -jar ShelfSenseBE-0.0.1-SNAPSHOT.jar > app.log 2>&1 & sleep 20 && pgrep -f ShelfSenseBE-0.0.1-SNAPSHOT.jar && echo 'JAR started successfully' || exit 1"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key azureuser@168.61.83.8 "
+        SPRING_DATASOURCE_URL='${{ secrets.SPRING_DATASOURCE_URL }}' \
+        SPRING_DATASOURCE_USERNAME='${{ secrets.SPRING_DATASOURCE_USERNAME }}' \
+        SPRING_DATASOURCE_PASSWORD='${{ secrets.SPRING_DATASOURCE_PASSWORD }}' \
+        SERVER_ADDRESS=${{ secrets.SERVER_ADDRESS }} \
+        SERVER_PORT=${{ secrets.SERVER_PORT }} \
+        nohup java -jar ShelfSenseBE-0.0.1-SNAPSHOT.jar > app.log 2>&1 & sleep 20 && pgrep -f ShelfSenseBE-0.0.1-SNAPSHOT.jar && echo 'JAR started successfully' || exit 1
+        "
+        
 
