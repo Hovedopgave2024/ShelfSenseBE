@@ -55,8 +55,7 @@ public class UserService
 
         if (
                 !passwordValidator.isValidPassword(updateUserDTO.getNewPassword()) ||
-                        !passwordEncoder.matches(updateUserDTO.getOldPassword(), user.getPassword()) ||
-                        passwordEncoder.matches(updateUserDTO.getNewPassword(), user.getPassword())
+                        !passwordEncoder.matches(updateUserDTO.getOldPassword(), user.getPassword())
 
         ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
