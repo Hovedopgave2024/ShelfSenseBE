@@ -4,6 +4,7 @@ import com.example.shelfsensebe.DTO.UpdateUserDTO;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.UserRepository;
+import com.example.shelfsensebe.Service.UserService;
 import com.example.shelfsensebe.utility.PasswordValidator;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import jakarta.servlet.http.HttpSession;
@@ -26,10 +27,7 @@ public class UserController
     PasswordEncoder passwordEncoder;
 
     @Autowired
-    PasswordValidator passwordValidator;
-
-    @Autowired
-    TextSanitizer textSanitizer;
+    private UserService userService;
 
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(HttpSession session, @PathVariable int id) {
@@ -46,13 +44,7 @@ public class UserController
         if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        if (userRepository.findByName(user.getName()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(null);
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setName(textSanitizer.sanitize(user.getName()));
-        User savedUser = userRepository.save(user);
+        User savedUser = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
@@ -73,23 +65,11 @@ public class UserController
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UpdateUserDTO updateUserDTO, HttpSession session) {
         // Validate session (ensure user is authenticated)
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null || userDTO.getId() != updateUserDTO.getId()) {
+        if (userDTO == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
-        User user = userRepository.findById(userDTO.getId());
-
-        if (
-                !passwordValidator.isValidPassword(updateUserDTO.getNewPassword()) ||
-                !passwordEncoder.matches(updateUserDTO.getOldPassword(), user.getPassword())
-        ) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        user.setName(textSanitizer.sanitize(updateUserDTO.getName()));
-        user.setPassword(passwordEncoder.encode(updateUserDTO.getNewPassword()));
-        userRepository.save(user);
-
-        UserDTO updatedUser = new UserDTO(user.getId(), updateUserDTO.getName());
+        updateUserDTO.setId(userDTO.getId());
+        UserDTO updatedUser = userService.updateUser(updateUserDTO);
 
         return ResponseEntity.ok(updatedUser);
     }
