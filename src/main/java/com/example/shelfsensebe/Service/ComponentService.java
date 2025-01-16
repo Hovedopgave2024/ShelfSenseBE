@@ -12,10 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class ComponentService
@@ -155,7 +157,9 @@ public class ComponentService
                         .bodyValue(requestBody)
                         .retrieve()
                         .bodyToMono(MouserResponseDTO.class)
-                        .timeout(Duration.ofSeconds(10))
+                        .timeout(Duration.ofSeconds(8))
+                        .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                                        .filter(throwable -> throwable instanceof TimeoutException))
                         .block();
 
                 if (apiResponse == null) {
