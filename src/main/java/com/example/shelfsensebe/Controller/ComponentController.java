@@ -1,5 +1,6 @@
 package com.example.shelfsensebe.Controller;
 
+import com.example.shelfsensebe.DTO.MouserApiDTO.MouserRequestDTO;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ComponentRepository;
@@ -68,9 +69,9 @@ public class ComponentController {
     }
 
     @PostMapping("components/mouser")
-    public ResponseEntity<List<Component>> fetchApiAndUpdateUserComponentsData(@Valid @RequestBody Map<String, String> requestBody, HttpSession session) {
-        int userId = Integer.parseInt(requestBody.get("userId"));
-        String apiKey = requestBody.get("apiKey");
+    public ResponseEntity<List<Component>> fetchApiAndUpdateUserComponentsData(@Valid @RequestBody MouserRequestDTO mouserRequestDTO, HttpSession session) {
+        int userId = mouserRequestDTO.getUserId();
+        String apiKey = mouserRequestDTO.getApiKey();
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null || userDTO.getId() != userId) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -42,6 +42,4 @@ public class ProductComponentController
 
         return ResponseEntity.ok(savedProductComponents);
     }
-
-
 }
