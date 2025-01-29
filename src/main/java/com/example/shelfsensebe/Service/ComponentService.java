@@ -38,6 +38,9 @@ public class ComponentService
     @Autowired
     private TextSanitizer textSanitizer;
 
+    @Autowired
+    private ApiUpdateService apiUpdateService;
+
     @Value("${apiKey}")
     String apiKey;
 
@@ -267,5 +270,6 @@ public class ComponentService
     public void scheduledFetchAndUpdate() {
         System.out.println("Running scheduled component update at: " + ZonedDateTime.now(ZoneId.of("Europe/Copenhagen")));
         fetchAndUpdateComponentsWithSupplierInfo(apiKey);
+        apiUpdateService.updateApiLastUpdated();
     }
 }
