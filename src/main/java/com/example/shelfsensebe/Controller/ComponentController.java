@@ -66,18 +66,4 @@ public class ComponentController {
             componentService.deleteComponent(id, userDTO);
             return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("components/mouser")
-    public ResponseEntity<List<Component>> fetchApiAndUpdateUserComponentsData(@Valid @RequestBody Map<String, String> requestBody, HttpSession session) {
-        int userId = Integer.parseInt(requestBody.get("userId"));
-        String apiKey = requestBody.get("apiKey");
-        UserDTO userDTO = (UserDTO) session.getAttribute("user");
-        if (userDTO == null || userDTO.getId() != userId) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-            List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userDTO.getId());
-            apiUpdateService.updateApiLastUpdated(userDTO.getId());
-            return ResponseEntity.ok(updatedComponents);
-    }
-
 }

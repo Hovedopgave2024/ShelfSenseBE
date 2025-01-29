@@ -87,12 +87,11 @@ public class ComponentServiceTest {
     void testFetchAndUpdateComponentsWithSupplierInfo_Returns_UpdatedComponents() {
         // Arrange
         String apiKey = "dummyApiKey";
-        int userId = 1;
 
         Component existingComponent = getExistingComponent();
 
         Component mockComponent = getExistingComponent();
-        when(componentRepository.findBySupplierAndUser_Id(eq(existingComponent.getSupplier()), eq(userId)))
+        when(componentRepository.findBySupplier(eq(existingComponent.getSupplier())))
                 .thenReturn(List.of(mockComponent));
 
         SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
@@ -143,7 +142,7 @@ public class ComponentServiceTest {
         when(statusCalculator.calculateStatus(16, 5, 3)).thenReturn(4);
 
         // Act
-        List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey, userId);
+        List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey);
 
         // Assert
         assertEquals(1, updatedComponents.size());
@@ -154,7 +153,7 @@ public class ComponentServiceTest {
         assertEquals(4, updatedComponent.getSupplierStockStatus());
 
         // Verify interactions
-        verify(componentRepository, times(1)).findBySupplierAndUser_Id("Mouser", userId); // Correct verify
+        verify(componentRepository, times(1)).findBySupplier("Mouser"); // Correct verify
         verify(webClient, times(1)).post(); // Correct verify
         verify(requestBodySpec, times(1)).bodyValue(any(SearchByKeywordRequestBodyDTO.class)); // Correct verify
         verify(componentRepository, times(1)).saveAll(updatedComponents);
@@ -164,13 +163,11 @@ public class ComponentServiceTest {
 
     @Test
     void testFetchAndUpdateComponentsWithSupplierInfoWithMissingApiKey_Returns_400_BadRequest() {
-        // Arrange
-        int userId = 1;
 
         // Mock the existing component
         Component existingComponent = getExistingComponent();
         Component mockComponent = getExistingComponent();
-        when(componentRepository.findBySupplierAndUser_Id(eq(existingComponent.getSupplier()), eq(userId)))
+        when(componentRepository.findBySupplier(eq(existingComponent.getSupplier())))
                 .thenReturn(List.of(mockComponent));
 
         // Create the keywordRequest with a null manufacturer to trigger a 400 error
@@ -219,14 +216,14 @@ public class ComponentServiceTest {
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
             // Call the service method which should throw the ResponseStatusException
-            componentService.fetchAndUpdateComponentsWithSupplierInfo(null, userId); // Simulating invalid API key
+            componentService.fetchAndUpdateComponentsWithSupplierInfo(null); // Simulating invalid API key
         });
 
         // Assert that the exception is a 400 Bad Request
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
 
         // Verify interactions
-        verify(componentRepository, times(1)).findBySupplierAndUser_Id(eq(existingComponent.getSupplier()), eq(userId));
+        verify(componentRepository, times(1)).findBySupplier(eq(existingComponent.getSupplier()));
         verify(webClient, times(1)).post();
         verify(requestBodySpec, times(1)).bodyValue(any(SearchByKeywordRequestBodyDTO.class));
         verify(requestHeadersSpec, times(1)).retrieve();
