@@ -140,9 +140,7 @@ public class ComponentService
                     long remainingTime = 65000 - elapsedTime; // Calculate remaining time to complete 1 minute and 5 second buffer
 
                     if (remainingTime > 0) {
-                        System.out.println("Waiting for " + remainingTime + " milliseconds...");
                         Thread.sleep(remainingTime); // Wait only for the remaining time
-                        System.out.println("Starting api again...");
                     }
                     lastBatchStartTime = System.currentTimeMillis(); // Reset batch start time
                 }
@@ -199,7 +197,6 @@ public class ComponentService
                 SearchResultDTO searchResults = apiResponse.getSearchResults();
 
                 if (searchResults.getParts() == null || searchResults.getParts().isEmpty()) {
-                    System.out.println("Found no search results for component with id " + component.getId());
                     continue;
                 }
 
@@ -211,7 +208,6 @@ public class ComponentService
                         (part.getAvailabilityOnOrder() == null || part.getAvailabilityOnOrder().isEmpty()) &&
                         component.getSupplierIncomingStock() == null && component.getSupplierIncomingDate() == null
                 ) {
-                    System.out.println("skipping component with id " + component.getId() + " because all data is the same from the db");
                     continue;
                 } else if (
                         part.getAvailabilityOnOrder() != null && !part.getAvailabilityOnOrder().isEmpty() &&
@@ -219,7 +215,6 @@ public class ComponentService
                                 part.getAvailabilityOnOrder().get(0).getQuantity() == component.getSupplierIncomingStock() &&
                                 part.getAvailabilityOnOrder().get(0).getDate() == component.getSupplierIncomingDate()
                 ) {
-                    System.out.println("skipping component with id " + component.getId() + " because all data is the same from the db");
                     continue;
                 }
 
@@ -246,12 +241,8 @@ public class ComponentService
                 ));
                 updatedComponents.add(component);
 
-                System.out.println("component with id " + component.getId() + " updated");
-
                 // Add count to api counter
                 apiCallCount++;
-
-                System.out.println("api call count: " + apiCallCount);
 
             } catch (ResponseStatusException e) {
                 // Catch and log the ResponseStatusException
@@ -270,12 +261,11 @@ public class ComponentService
         return updatedComponents;
     }
 
-    // @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
+    @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
     // test every minute:
-    @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
+    // @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
     public void scheduledFetchAndUpdate() {
         System.out.println("Running scheduled component update at: " + ZonedDateTime.now(ZoneId.of("Europe/Copenhagen")));
         fetchAndUpdateComponentsWithSupplierInfo(apiKey);
     }
-
 }
