@@ -8,13 +8,17 @@ import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.utility.StatusCalculator;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -33,6 +37,12 @@ public class ComponentService
 
     @Autowired
     private TextSanitizer textSanitizer;
+
+    @Autowired
+    private ApiUpdateService apiUpdateService;
+
+    @Value("${apiKey}")
+    String apiKey;
 
     public void validateOwnership(UserDTO userDTO, Component component) {
         if (userDTO == null || component == null) {
@@ -116,9 +126,9 @@ public class ComponentService
         componentRepository.delete(component);
     }
 
-    public List<Component> fetchAndUpdateComponentsWithSupplierInfo(String apiKey, int userId) {
+    public List<Component> fetchAndUpdateComponentsWithSupplierInfo(String apiKey) {
         // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
-        List<Component> components = componentRepository.findBySupplierAndUser_Id("Mouser", userId);
+        List<Component> components = componentRepository.findBySupplier("Mouser");
         List<Component> updatedComponents = new ArrayList<>();
 
         // Control the 30 API calls limit per minute
@@ -133,9 +143,7 @@ public class ComponentService
                     long remainingTime = 65000 - elapsedTime; // Calculate remaining time to complete 1 minute and 5 second buffer
 
                     if (remainingTime > 0) {
-                        System.out.println("Waiting for " + remainingTime + " milliseconds...");
                         Thread.sleep(remainingTime); // Wait only for the remaining time
-                        System.out.println("Starting api again...");
                     }
                     lastBatchStartTime = System.currentTimeMillis(); // Reset batch start time
                 }
@@ -192,12 +200,28 @@ public class ComponentService
                 SearchResultDTO searchResults = apiResponse.getSearchResults();
 
                 if (searchResults.getParts() == null || searchResults.getParts().isEmpty()) {
-                    System.out.println("Found no search results for component with id " + component.getId());
                     continue;
                 }
 
 
                 PartDTO part = searchResults.getParts().get(0);
+
+                if (
+                        part.getAvailabilityInStock() == component.getSupplierStock() &&
+                        (part.getAvailabilityOnOrder() == null || part.getAvailabilityOnOrder().isEmpty()) &&
+                        component.getSupplierIncomingStock() == null && component.getSupplierIncomingDate() == null
+                ) {
+                    continue;
+                } else if (
+                        part.getAvailabilityOnOrder() != null && !part.getAvailabilityOnOrder().isEmpty() &&
+                                part.getAvailabilityInStock() == component.getSupplierStock() &&
+                                part.getAvailabilityOnOrder().get(0).getQuantity() == component.getSupplierIncomingStock() &&
+                                part.getAvailabilityOnOrder().get(0).getDate() == component.getSupplierIncomingDate()
+                ) {
+                    continue;
+                }
+
+
                 if (part.getAvailabilityInStock() > 0) {
                     component.setSupplierStock(part.getAvailabilityInStock());
                 } else {
@@ -240,4 +264,12 @@ public class ComponentService
         return updatedComponents;
     }
 
+    @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
+    // test every minute:
+    // @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
+    public void scheduledFetchAndUpdate() {
+        System.out.println("Running scheduled component update at: " + ZonedDateTime.now(ZoneId.of("Europe/Copenhagen")));
+        fetchAndUpdateComponentsWithSupplierInfo(apiKey);
+        apiUpdateService.updateApiLastUpdated();
+    }
 }
