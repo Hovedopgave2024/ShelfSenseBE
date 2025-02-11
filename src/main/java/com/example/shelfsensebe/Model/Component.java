@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import java.sql.Date;
 import java.util.List;
 
 @Getter
@@ -27,34 +26,9 @@ public class Component
     @NotEmpty
     private String name;
 
-    @Column(name = "type", nullable = false)
-    @NotNull
-    @NotEmpty
-    private String type;
-
-    @Column(name = "footprint", nullable = false)
-    @NotNull
-    @NotEmpty
-    private String footprint;
-
-    @Column(name = "manufacturer", nullable = false)
-    @NotNull
-    @NotEmpty
-    private String manufacturer;
-
-    @Column(name = "manufacturer_part", nullable = false)
-    @NotNull
-    @NotEmpty
-    private String manufacturerPart;
-
     @Column(name = "price", nullable = false)
     @Min(0)
     private double price;
-
-    @Column(name = "supplier", nullable = false)
-    @NotNull
-    @NotEmpty
-    private String supplier;
 
     @Column(name = "stock", nullable = false)
     @Min(0)
@@ -68,13 +42,6 @@ public class Component
     @Min(0)
     private int safetyStockRop;
 
-    @Column(name = "stock_status", nullable = false)
-    private int stockStatus;
-
-    @Column(name = "supplier_stock")
-    @Min(0)
-    private Integer supplierStock;
-
     @Column(name = "supplier_safety_stock")
     @Min(0)
     private int supplierSafetyStock;
@@ -83,27 +50,31 @@ public class Component
     @Min(0)
     private int supplierSafetyStockRop;
 
-    @Column(name = "supplier_stock_status")
-    @Min(0)
-    private Integer supplierStockStatus;
+       /*
+    @Column(name = "type", nullable = false)
+    @NotNull
+    @NotEmpty
+    private String type;
 
-    @Column(name = "supplier_incoming_stock")
-    @Min(0)
-    private Integer supplierIncomingStock;
-
-    @Column(name = "supplier_incoming_date")
-    private Date supplierIncomingDate;
+    @Column(name = "footprint", nullable = false)
+    @NotNull
+    @NotEmpty
+    private String footprint;
 
     @Column(name = "designator")
     private String designator;
-
-    @Column(name = "supplier_part")
-    private String supplierPart;
+     */
 
     @JsonIgnore
     @JsonManagedReference("component-productComponentList")
     @OneToMany(mappedBy = "component")
     private List<ProductComponent> productComponentList;
+
+    @OneToOne(mappedBy = "component", cascade = CascadeType.ALL, orphanRemoval = true)
+    private OptionalComponentField optionalComponentField;
+
+    @OneToOne(mappedBy = "component", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Supplier supplier;
 
     @JsonBackReference("user-componentList")
     @ManyToOne
