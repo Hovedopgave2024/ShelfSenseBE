@@ -62,7 +62,7 @@ public class ComponentService
 
         Component savedComponent = componentRepository.save(component);
         savedComponent.setStockStatus(component.getStockStatus());
-
+        savedComponent.setSupplierStockStatus(component.getSupplierStockStatus());
         return savedComponent;
     }
 
