@@ -1,6 +1,7 @@
 
 /.idea/
 /target/
+/src/main/resources/application.properties
 
 !.mvn/wrapper/maven-wrapper.jar
 
