@@ -68,9 +68,6 @@ public class Component
     @Min(0)
     private int safetyStockRop;
 
-    @Column(name = "stock_status", nullable = false)
-    private int stockStatus;
-
     @Column(name = "supplier_stock")
     @Min(0)
     private Integer supplierStock;
@@ -82,10 +79,6 @@ public class Component
     @Column(name = "supplier_safety_stock_rop")
     @Min(0)
     private int supplierSafetyStockRop;
-
-    @Column(name = "supplier_stock_status")
-    @Min(0)
-    private Integer supplierStockStatus;
 
     @Column(name = "supplier_incoming_stock")
     @Min(0)
@@ -114,4 +107,12 @@ public class Component
     public Integer getUserId() {
         return user != null ? user.getId() : null;
     }
+
+    @Transient
+    @JsonProperty("stockStatus")
+    private Integer stockStatus;
+
+    @Transient
+    @JsonProperty("supplierStockStatus")
+    private Integer supplierStockStatus;
 }

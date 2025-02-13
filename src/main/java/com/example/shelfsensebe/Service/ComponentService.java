@@ -5,7 +5,6 @@ import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
-import com.example.shelfsensebe.utility.StatusCalculator;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,9 +32,6 @@ public class ComponentService
     private WebClient webClient;
 
     @Autowired
-    private StatusCalculator statusCalculator;
-
-    @Autowired
     private TextSanitizer textSanitizer;
 
     @Autowired
@@ -53,12 +49,6 @@ public class ComponentService
     public Component createComponent(Component component, UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
-
-        component.setStockStatus(statusCalculator.calculateStatus(
-                component.getStock(),
-                component.getSafetyStock(),
-                component.getSafetyStockRop()
-        ));
 
         component.setUser(user);
         component.setName(textSanitizer.sanitize(component.getName()));
@@ -101,20 +91,6 @@ public class ComponentService
         existingComponent.setSupplierSafetyStockRop(updatedComponent.getSupplierSafetyStockRop());
         existingComponent.setDesignator(updatedComponent.getDesignator() != null ? textSanitizer.sanitize(updatedComponent.getDesignator()): null);
         existingComponent.setSupplierPart(updatedComponent.getSupplierPart() != null ? textSanitizer.sanitize(updatedComponent.getSupplierPart()): null);
-
-        existingComponent.setStockStatus(statusCalculator.calculateStatus(updatedComponent.getStock(),
-                updatedComponent.getSafetyStock(), updatedComponent.getSafetyStockRop()));
-
-     if (existingComponent.getSupplierStock() != null)
-     {
-            existingComponent.setSupplierStockStatus(statusCalculator.calculateStatus(
-                    existingComponent.getSupplierStock(),
-                    updatedComponent.getSupplierSafetyStock(),
-                    updatedComponent.getSupplierSafetyStockRop()
-            ));
-     }
-
-
         return componentRepository.save(existingComponent);
     }
 
@@ -237,11 +213,6 @@ public class ComponentService
                     component.setSupplierIncomingDate(null);
                 }
 
-                component.setSupplierStockStatus(statusCalculator.calculateStatus(
-                        component.getSupplierStock(),
-                        component.getSupplierSafetyStock(),
-                        component.getSupplierSafetyStockRop()
-                ));
                 updatedComponents.add(component);
 
                 // Add count to api counter
