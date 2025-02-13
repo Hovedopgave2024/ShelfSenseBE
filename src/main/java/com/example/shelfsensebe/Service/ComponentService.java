@@ -60,7 +60,10 @@ public class ComponentService
         component.setDesignator(component.getDesignator() != null ? textSanitizer.sanitize(component.getDesignator()): null);
         component.setSupplierPart(component.getSupplierPart() != null ? textSanitizer.sanitize(component.getSupplierPart()): null);
 
-        return componentRepository.save(component);
+        Component savedComponent = componentRepository.save(component);
+        savedComponent.setStockStatus(component.getStockStatus());
+
+        return savedComponent;
     }
 
     public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO)
@@ -91,7 +94,12 @@ public class ComponentService
         existingComponent.setSupplierSafetyStockRop(updatedComponent.getSupplierSafetyStockRop());
         existingComponent.setDesignator(updatedComponent.getDesignator() != null ? textSanitizer.sanitize(updatedComponent.getDesignator()): null);
         existingComponent.setSupplierPart(updatedComponent.getSupplierPart() != null ? textSanitizer.sanitize(updatedComponent.getSupplierPart()): null);
-        return componentRepository.save(existingComponent);
+
+        Component component = componentRepository.save(existingComponent);
+        component.setStockStatus(updatedComponent.getStockStatus());
+        component.setSupplierStockStatus(updatedComponent.getSupplierStockStatus());
+
+        return component;
     }
 
     public void deleteComponent(int id, UserDTO userDTO) {
@@ -236,8 +244,7 @@ public class ComponentService
     }
 
     @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
-    // test every minute:
-    // @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
+    // test every minute: @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
     public void scheduledFetchAndUpdate() {
         System.out.println("Running scheduled component update at: " + ZonedDateTime.now(ZoneId.of("Europe/Copenhagen")));
         fetchAndUpdateComponentsWithSupplierInfo(apiKey);
