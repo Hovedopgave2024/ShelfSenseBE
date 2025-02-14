@@ -187,24 +187,7 @@ public class ComponentService
                     continue;
                 }
 
-
                 PartDTO part = searchResults.getParts().get(0);
-
-                if (
-                        part.getAvailabilityInStock() == component.getSupplierStock() &&
-                        (part.getAvailabilityOnOrder() == null || part.getAvailabilityOnOrder().isEmpty()) &&
-                        component.getSupplierIncomingStock() == null && component.getSupplierIncomingDate() == null
-                ) {
-                    continue;
-                } else if (
-                        part.getAvailabilityOnOrder() != null && !part.getAvailabilityOnOrder().isEmpty() &&
-                                part.getAvailabilityInStock() == component.getSupplierStock() &&
-                                part.getAvailabilityOnOrder().get(0).getQuantity() == component.getSupplierIncomingStock() &&
-                                part.getAvailabilityOnOrder().get(0).getDate() == component.getSupplierIncomingDate()
-                ) {
-                    continue;
-                }
-
 
                 if (part.getAvailabilityInStock() > 0) {
                     component.setSupplierStock(part.getAvailabilityInStock());
@@ -245,6 +228,7 @@ public class ComponentService
 
     @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
     // test every minute: @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
+    // test every 10 seconds: @Scheduled(cron = "*/10 * * * * ?", zone = "Europe/Copenhagen")
     public void scheduledFetchAndUpdate() {
         System.out.println("Running scheduled component update at: " + ZonedDateTime.now(ZoneId.of("Europe/Copenhagen")));
         fetchAndUpdateComponentsWithSupplierInfo(apiKey);
