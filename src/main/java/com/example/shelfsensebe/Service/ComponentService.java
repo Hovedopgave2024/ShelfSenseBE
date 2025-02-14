@@ -5,7 +5,6 @@ import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
-import com.example.shelfsensebe.utility.StatusCalculator;
 import com.example.shelfsensebe.utility.TextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,9 +32,6 @@ public class ComponentService
     private WebClient webClient;
 
     @Autowired
-    private StatusCalculator statusCalculator;
-
-    @Autowired
     private TextSanitizer textSanitizer;
 
     @Autowired
@@ -54,12 +50,6 @@ public class ComponentService
         User user = new User();
         user.setId(userDTO.getId());
 
-        component.setStockStatus(statusCalculator.calculateStatus(
-                component.getStock(),
-                component.getSafetyStock(),
-                component.getSafetyStockRop()
-        ));
-
         component.setUser(user);
         component.setName(textSanitizer.sanitize(component.getName()));
         component.setType(textSanitizer.sanitize(component.getType()));
@@ -70,7 +60,10 @@ public class ComponentService
         component.setDesignator(component.getDesignator() != null ? textSanitizer.sanitize(component.getDesignator()): null);
         component.setSupplierPart(component.getSupplierPart() != null ? textSanitizer.sanitize(component.getSupplierPart()): null);
 
-        return componentRepository.save(component);
+        Component savedComponent = componentRepository.save(component);
+        savedComponent.setStockStatus(component.getStockStatus());
+        savedComponent.setSupplierStockStatus(component.getSupplierStockStatus());
+        return savedComponent;
     }
 
     public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO)
@@ -102,20 +95,11 @@ public class ComponentService
         existingComponent.setDesignator(updatedComponent.getDesignator() != null ? textSanitizer.sanitize(updatedComponent.getDesignator()): null);
         existingComponent.setSupplierPart(updatedComponent.getSupplierPart() != null ? textSanitizer.sanitize(updatedComponent.getSupplierPart()): null);
 
-        existingComponent.setStockStatus(statusCalculator.calculateStatus(updatedComponent.getStock(),
-                updatedComponent.getSafetyStock(), updatedComponent.getSafetyStockRop()));
+        Component component = componentRepository.save(existingComponent);
+        component.setStockStatus(updatedComponent.getStockStatus());
+        component.setSupplierStockStatus(updatedComponent.getSupplierStockStatus());
 
-     if (existingComponent.getSupplierStock() != null)
-     {
-            existingComponent.setSupplierStockStatus(statusCalculator.calculateStatus(
-                    existingComponent.getSupplierStock(),
-                    updatedComponent.getSupplierSafetyStock(),
-                    updatedComponent.getSupplierSafetyStockRop()
-            ));
-     }
-
-
-        return componentRepository.save(existingComponent);
+        return component;
     }
 
     public void deleteComponent(int id, UserDTO userDTO) {
@@ -203,24 +187,7 @@ public class ComponentService
                     continue;
                 }
 
-
                 PartDTO part = searchResults.getParts().get(0);
-
-                if (
-                        part.getAvailabilityInStock() == component.getSupplierStock() &&
-                        (part.getAvailabilityOnOrder() == null || part.getAvailabilityOnOrder().isEmpty()) &&
-                        component.getSupplierIncomingStock() == null && component.getSupplierIncomingDate() == null
-                ) {
-                    continue;
-                } else if (
-                        part.getAvailabilityOnOrder() != null && !part.getAvailabilityOnOrder().isEmpty() &&
-                                part.getAvailabilityInStock() == component.getSupplierStock() &&
-                                part.getAvailabilityOnOrder().get(0).getQuantity() == component.getSupplierIncomingStock() &&
-                                part.getAvailabilityOnOrder().get(0).getDate() == component.getSupplierIncomingDate()
-                ) {
-                    continue;
-                }
-
 
                 if (part.getAvailabilityInStock() > 0) {
                     component.setSupplierStock(part.getAvailabilityInStock());
@@ -237,11 +204,6 @@ public class ComponentService
                     component.setSupplierIncomingDate(null);
                 }
 
-                component.setSupplierStockStatus(statusCalculator.calculateStatus(
-                        component.getSupplierStock(),
-                        component.getSupplierSafetyStock(),
-                        component.getSupplierSafetyStockRop()
-                ));
                 updatedComponents.add(component);
 
                 // Add count to api counter
@@ -265,8 +227,8 @@ public class ComponentService
     }
 
     @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
-    // test every minute:
-    // @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
+    // test every minute: @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
+    // test every 10 seconds: @Scheduled(cron = "*/10 * * * * ?", zone = "Europe/Copenhagen")
     public void scheduledFetchAndUpdate() {
         System.out.println("Running scheduled component update at: " + ZonedDateTime.now(ZoneId.of("Europe/Copenhagen")));
         fetchAndUpdateComponentsWithSupplierInfo(apiKey);
