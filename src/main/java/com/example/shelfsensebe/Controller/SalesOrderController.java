@@ -26,7 +26,8 @@ public class SalesOrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSalesOrder);
     }
 
-    @PutMapping("/salesOrders")
+    // Updating sales order is not possible after making multiple products in a sales order.
+    /* @PutMapping("/salesOrders")
     public ResponseEntity<SalesOrder> updateSalesOrder(@Valid @RequestBody SalesOrder updatedSalesOrder, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");
         if (userDTO == null) {
@@ -34,7 +35,7 @@ public class SalesOrderController {
         }
         SalesOrder savedSalesOrder = salesOrderService.updateSalesOrder(updatedSalesOrder);
         return ResponseEntity.ok(savedSalesOrder);
-    }
+    } */
 
     @DeleteMapping("/salesOrders/{id}")
     public ResponseEntity<Void> deleteSalesOrder(@Valid @PathVariable int id, HttpSession session) {

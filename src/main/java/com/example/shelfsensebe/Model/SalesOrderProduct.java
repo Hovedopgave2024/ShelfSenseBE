@@ -25,13 +25,12 @@ public class SalesOrderProduct {
     @Min(1)
     private int productId;
 
-    @JsonIgnore
     @JsonBackReference("salesOrder-salesOrderProductList")
     @ManyToOne
     @JoinColumn(name = "sales_order_id", nullable = false)
     private SalesOrder salesOrder;
 
-    @JsonProperty("salesOrderid")
+    @JsonProperty("salesOrderId")
     public Integer getSalesOrderId() {
         return salesOrder != null ? salesOrder.getId() : null;
     }
