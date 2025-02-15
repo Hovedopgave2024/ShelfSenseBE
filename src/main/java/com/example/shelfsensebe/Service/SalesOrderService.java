@@ -6,7 +6,6 @@ import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.Repository.ProductRepository;
 import com.example.shelfsensebe.Repository.SalesOrderRepository;
 import com.example.shelfsensebe.utility.TextSanitizer;
-import com.example.shelfsensebe.utility.StatusCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,8 +26,6 @@ public class SalesOrderService {
     TextSanitizer textSanitizer;
     @Autowired
     ComponentRepository componentRepository;
-    @Autowired
-    StatusCalculator statusCalculator;
 
     @Transactional
     public SalesOrder createSalesOrder(SalesOrder salesOrder, UserDTO userDTO) {
@@ -73,11 +70,6 @@ public class SalesOrderService {
             }
 
             component.setStock(component.getStock() - totalQuantityUsed);
-            component.setStockStatus(statusCalculator.calculateStatus(
-                    component.getStock(),
-                    component.getSafetyStock(),
-                    component.getSafetyStockRop()
-            ));
 
             updatedComponents.add(component);
 
@@ -140,11 +132,6 @@ public class SalesOrderService {
 
             // Revert the stock
             component.setStock(component.getStock() + revertQuantity);
-            component.setStockStatus(statusCalculator.calculateStatus(
-                    component.getStock(),
-                    component.getSafetyStock(),
-                    component.getSafetyStockRop()
-            ));
 
             updatedComponents.add(component);
         }

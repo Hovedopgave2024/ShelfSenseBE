@@ -3,7 +3,6 @@ package com.example.shelfsensebe.Service;
 import com.example.shelfsensebe.DTO.MouserApiDTO.*;
 import com.example.shelfsensebe.Model.Component;
 import com.example.shelfsensebe.Repository.ComponentRepository;
-import com.example.shelfsensebe.utility.StatusCalculator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,9 +55,6 @@ public class ComponentServiceTest {
 
     @Mock
     private ComponentRepository componentRepository;
-
-    @Mock
-    private StatusCalculator statusCalculator;
 
     @InjectMocks
     private ComponentService componentService;
@@ -139,8 +135,6 @@ public class ComponentServiceTest {
 
         when(responseSpec.bodyToMono(MouserResponseDTO.class)).thenReturn(Mono.just(mockApiResponse));
 
-        when(statusCalculator.calculateStatus(16, 5, 3)).thenReturn(4);
-
         // Act
         List<Component> updatedComponents = componentService.fetchAndUpdateComponentsWithSupplierInfo(apiKey);
 
@@ -150,7 +144,6 @@ public class ComponentServiceTest {
         assertEquals(16, updatedComponent.getSupplierStock());
         assertEquals(3, updatedComponent.getSupplierIncomingStock());
         assertEquals(Date.valueOf("2024-12-10"), updatedComponent.getSupplierIncomingDate());
-        assertEquals(4, updatedComponent.getSupplierStockStatus());
 
         // Verify interactions
         verify(componentRepository, times(1)).findBySupplier("Mouser"); // Correct verify
