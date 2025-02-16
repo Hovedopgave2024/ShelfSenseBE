@@ -35,12 +35,12 @@ public class SalesOrderService {
         salesOrder.setUser(user);
 
         salesOrder.setCreatedDate(salesOrder.getCreatedDate());
+        salesOrder.setPrice(salesOrder.getPrice());
 
         if (salesOrder.getSalesOrderProducts() == null || salesOrder.getSalesOrderProducts().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one product is required in the sales order.");
         }
 
-        double totalPrice = 0;
         List<Component> updatedComponents = new ArrayList<>();
 
         for (SalesOrderProduct salesOrderProduct : salesOrder.getSalesOrderProducts()) {
@@ -49,9 +49,6 @@ public class SalesOrderService {
             Product product = productRepository.findById(salesOrderProduct.getProductId()).orElseThrow(() ->
                     new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found")
             );
-
-            // Calculate total price
-            totalPrice += product.getPrice() * salesOrderProduct.getQuantity();
 
             // Associate the SalesOrderProduct with SalesOrder
             salesOrderProduct.setSalesOrder(salesOrder);
@@ -79,9 +76,6 @@ public class SalesOrderService {
                 }
             }
         }
-
-        // Set total price to the sales order
-        salesOrder.setPrice(totalPrice);
 
         // Save the updated components
         componentRepository.saveAll(updatedComponents);
