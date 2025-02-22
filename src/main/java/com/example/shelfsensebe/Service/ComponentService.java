@@ -66,14 +66,9 @@ public class ComponentService
             supplier.setManufacturer(textSanitizer.sanitize(supplier.getManufacturer()));
             supplier.setManufacturerPart(textSanitizer.sanitize(supplier.getManufacturerPart()));
             supplier.setSupplierPart(supplier.getSupplierPart() != null ? textSanitizer.sanitize(supplier.getSupplierPart()) : null);
-
-            supplier.setComponent(component);
-
-            supplier.setStock(supplier.getStock() != null ? supplier.getStock() : null);
-            supplier.setIncomingStock(supplier.getIncomingStock() != null ? supplier.getIncomingStock() : null);
-            supplier.setIncomingDate(supplier.getIncomingDate() != null ? supplier.getIncomingDate() : null);
             supplier.setSafetyStock(supplier.getSafetyStock());
             supplier.setSafetyStockRop(supplier.getSafetyStockRop());
+            supplier.setComponent(component);
         }
 
         Component savedComponent = componentRepository.save(component);
