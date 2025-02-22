@@ -26,7 +26,6 @@ public class SalesOrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSalesOrder);
     }
 
-    // Updating sales order is not possible after making multiple products in a sales order.
     /* @PutMapping("/salesOrders")
     public ResponseEntity<SalesOrder> updateSalesOrder(@Valid @RequestBody SalesOrder updatedSalesOrder, HttpSession session) {
         UserDTO userDTO = (UserDTO) session.getAttribute("user");

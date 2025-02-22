@@ -27,6 +27,7 @@ public class Component
     private String name;
 
     @OneToOne(mappedBy = "component", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("component-supplier")
     private Supplier supplier;
 
     @Column(name = "type", nullable = false)

@@ -1,5 +1,6 @@
 package com.example.shelfsensebe.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -27,6 +28,7 @@ public class Supplier
 
     @OneToOne
     @JoinColumn(name = "component_id", nullable = false, unique = true)
+    @JsonBackReference("component-supplier")
     private Component component;
 
     @Column(name = "manufacturer", nullable = false)

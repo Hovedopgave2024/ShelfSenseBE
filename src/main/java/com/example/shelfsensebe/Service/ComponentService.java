@@ -3,6 +3,7 @@ package com.example.shelfsensebe.Service;
 import com.example.shelfsensebe.DTO.MouserApiDTO.*;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
+import com.example.shelfsensebe.Model.Supplier;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.utility.TextSanitizer;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.util.retry.Retry;
@@ -46,6 +48,7 @@ public class ComponentService
         }
     }
 
+    @Transactional
     public Component createComponent(Component component, UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
@@ -54,52 +57,83 @@ public class ComponentService
         component.setName(textSanitizer.sanitize(component.getName()));
         component.setType(textSanitizer.sanitize(component.getType()));
         component.setFootprint(textSanitizer.sanitize(component.getFootprint()));
-        component.setManufacturerPart(textSanitizer.sanitize(component.getManufacturerPart()));
-        component.setManufacturer(textSanitizer.sanitize(component.getManufacturer()));
-        component.setSupplier(textSanitizer.sanitize(component.getSupplier()));
         component.setDesignator(component.getDesignator() != null ? textSanitizer.sanitize(component.getDesignator()): null);
-        component.setSupplierPart(component.getSupplierPart() != null ? textSanitizer.sanitize(component.getSupplierPart()): null);
+
+        if (component.getSupplier() != null) {
+            Supplier supplier = component.getSupplier();
+
+            supplier.setName(textSanitizer.sanitize(supplier.getName()));
+            supplier.setManufacturer(textSanitizer.sanitize(supplier.getManufacturer()));
+            supplier.setManufacturerPart(textSanitizer.sanitize(supplier.getManufacturerPart()));
+            supplier.setSupplierPart(supplier.getSupplierPart() != null ? textSanitizer.sanitize(supplier.getSupplierPart()) : null);
+
+            supplier.setComponent(component);
+
+            supplier.setStock(supplier.getStock() != null ? supplier.getStock() : null);
+            supplier.setIncomingStock(supplier.getIncomingStock() != null ? supplier.getIncomingStock() : null);
+            supplier.setIncomingDate(supplier.getIncomingDate() != null ? supplier.getIncomingDate() : null);
+            supplier.setSafetyStock(supplier.getSafetyStock());
+            supplier.setSafetyStockRop(supplier.getSafetyStockRop());
+        }
 
         Component savedComponent = componentRepository.save(component);
+
         savedComponent.setStockStatus(component.getStockStatus());
-        savedComponent.setSupplierStockStatus(component.getSupplierStockStatus());
+        savedComponent.getSupplier().setStockStatus(component.getSupplier().getStockStatus() != null ? component.getSupplier().getStockStatus() : null);
+
         return savedComponent;
     }
 
-    public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO)
-    {
+    public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO) {
         Component existingComponent = componentRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Component Not Found")
         );
         validateOwnership(userDTO, existingComponent);
 
-        if (updatedComponent.getStock() > existingComponent.getStock()) {
-            int newStock = updatedComponent.getStock() - existingComponent.getStock();
-            existingComponent.setStock(existingComponent.getStock() + newStock);
-        } else {
-            existingComponent.setStock(updatedComponent.getStock());
-        }
-
+        // Sanitize and update fields safely
         existingComponent.setName(textSanitizer.sanitize(updatedComponent.getName()));
         existingComponent.setType(textSanitizer.sanitize(updatedComponent.getType()));
         existingComponent.setFootprint(textSanitizer.sanitize(updatedComponent.getFootprint()));
-        existingComponent.setManufacturerPart(textSanitizer.sanitize(updatedComponent.getManufacturerPart()));
-        existingComponent.setManufacturer(textSanitizer.sanitize(updatedComponent.getManufacturer()));
         existingComponent.setPrice(updatedComponent.getPrice());
-        existingComponent.setSupplier(textSanitizer.sanitize(updatedComponent.getSupplier()));
         existingComponent.setStock(updatedComponent.getStock());
         existingComponent.setSafetyStock(updatedComponent.getSafetyStock());
         existingComponent.setSafetyStockRop(updatedComponent.getSafetyStockRop());
-        existingComponent.setSupplierSafetyStock(updatedComponent.getSupplierSafetyStock());
-        existingComponent.setSupplierSafetyStockRop(updatedComponent.getSupplierSafetyStockRop());
-        existingComponent.setDesignator(updatedComponent.getDesignator() != null ? textSanitizer.sanitize(updatedComponent.getDesignator()): null);
-        existingComponent.setSupplierPart(updatedComponent.getSupplierPart() != null ? textSanitizer.sanitize(updatedComponent.getSupplierPart()): null);
+        existingComponent.setDesignator(updatedComponent.getDesignator() != null ? textSanitizer.sanitize(updatedComponent.getDesignator()) : existingComponent.getDesignator());
 
-        Component component = componentRepository.save(existingComponent);
-        component.setStockStatus(updatedComponent.getStockStatus());
-        component.setSupplierStockStatus(updatedComponent.getSupplierStockStatus());
+        // Handle Supplier update
+        if (updatedComponent.getSupplier() != null) {
+            Supplier existingSupplier;
 
-        return component;
+            if (existingComponent.getSupplier() == null) {
+                // Create a new supplier if one does not exist
+                existingSupplier = new Supplier();
+                existingSupplier.setComponent(existingComponent);
+                existingComponent.setSupplier(existingSupplier);
+            } else {
+                // Use the existing supplier
+                existingSupplier = existingComponent.getSupplier();
+            }
+
+            Supplier updatedSupplier = updatedComponent.getSupplier();
+
+            existingSupplier.setName(textSanitizer.sanitize(updatedSupplier.getName()));
+            existingSupplier.setManufacturer(textSanitizer.sanitize(updatedSupplier.getManufacturer()));
+            existingSupplier.setManufacturerPart(textSanitizer.sanitize(updatedSupplier.getManufacturerPart()));
+            existingSupplier.setSupplierPart(textSanitizer.sanitize(updatedSupplier.getSupplierPart()));
+
+            existingSupplier.setStock(updatedSupplier.getStock());
+            existingSupplier.setIncomingStock(updatedSupplier.getIncomingStock());
+            existingSupplier.setIncomingDate(updatedSupplier.getIncomingDate());
+            existingSupplier.setSafetyStock(updatedSupplier.getSafetyStock());
+            existingSupplier.setSafetyStockRop(updatedSupplier.getSafetyStockRop());
+        }
+
+        Component savedComponent = componentRepository.save(existingComponent);
+
+        savedComponent.setStockStatus(updatedComponent.getStockStatus());
+        savedComponent.getSupplier().setStockStatus(updatedComponent.getSupplier().getStockStatus() != null ? updatedComponent.getSupplier().getStockStatus() : null);
+
+        return savedComponent;
     }
 
     public void deleteComponent(int id, UserDTO userDTO) {
@@ -112,7 +146,7 @@ public class ComponentService
 
     public List<Component> fetchAndUpdateComponentsWithSupplierInfo(String apiKey) {
         // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
-        List<Component> components = componentRepository.findBySupplier("Mouser");
+        List<Component> components = componentRepository.findBySupplier_Name("Mouser");
         List<Component> updatedComponents = new ArrayList<>();
 
         // Control the 30 API calls limit per minute
@@ -133,8 +167,8 @@ public class ComponentService
                 }
 
                 SearchByKeywordMfrNameRequestDTO keywordRequest = new SearchByKeywordMfrNameRequestDTO(
-                        component.getManufacturer(),
-                        component.getManufacturerPart(),
+                        component.getSupplier().getManufacturer(),
+                        component.getSupplier().getManufacturerPart(),
                         1,    // records
                         0,    // pageNumber
                         "",   // searchOptions
@@ -190,18 +224,18 @@ public class ComponentService
                 PartDTO part = searchResults.getParts().get(0);
 
                 if (part.getAvailabilityInStock() > 0) {
-                    component.setSupplierStock(part.getAvailabilityInStock());
+                    component.getSupplier().setStock(part.getAvailabilityInStock());
                 } else {
-                    component.setSupplierStock(null);
+                    component.getSupplier().setStock(null);
                 }
                 List<AvailabilityOnOrderDTO> availabilityOnOrder = part.getAvailabilityOnOrder();
                 if (availabilityOnOrder != null && !availabilityOnOrder.isEmpty()) {
                     AvailabilityOnOrderDTO firstOrder = availabilityOnOrder.get(0);
-                    component.setSupplierIncomingStock(firstOrder.getQuantity());
-                    component.setSupplierIncomingDate(firstOrder.getDate());
+                    component.getSupplier().setIncomingStock(firstOrder.getQuantity());
+                    component.getSupplier().setIncomingDate(firstOrder.getDate());
                 } else {
-                    component.setSupplierIncomingStock(null);
-                    component.setSupplierIncomingDate(null);
+                    component.getSupplier().setIncomingStock(null);
+                    component.getSupplier().setIncomingDate(null);
                 }
 
                 updatedComponents.add(component);
