@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +29,7 @@ public class Component
 
     @OneToOne(mappedBy = "component", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("component-supplier")
+    @Valid
     private Supplier supplier;
 
     @Column(name = "type", nullable = false)

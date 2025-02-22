@@ -71,8 +71,11 @@ public class ComponentService
 
         Component savedComponent = componentRepository.save(component);
 
-        savedComponent.setStockStatus(component.getStockStatus());
-        savedComponent.getSupplier().setStockStatus(component.getSupplier().getStockStatus());
+        savedComponent.setStockStatus(component.getStockStatus() != null ? component.getStockStatus() : null);
+
+        if (component.getSupplier() != null) {
+            savedComponent.getSupplier().setStockStatus(component.getSupplier().getStockStatus() != null ? component.getSupplier().getStockStatus() : null);
+        }
 
         return savedComponent;
     }
@@ -120,8 +123,11 @@ public class ComponentService
 
         Component savedComponent = componentRepository.save(existingComponent);
 
-        savedComponent.setStockStatus(updatedComponent.getStockStatus());
-        savedComponent.getSupplier().setStockStatus(updatedComponent.getSupplier().getStockStatus());
+        savedComponent.setStockStatus(updatedComponent.getStockStatus() != null ? updatedComponent.getStockStatus() : null);
+
+        if (updatedComponent.getSupplier() != null) {
+            savedComponent.getSupplier().setStockStatus(updatedComponent.getSupplier().getStockStatus() != null ? updatedComponent.getSupplier().getStockStatus() : null);
+        }
 
         return savedComponent;
     }
