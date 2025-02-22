@@ -3,6 +3,7 @@ package com.example.shelfsensebe.Service;
 import com.example.shelfsensebe.DTO.MouserApiDTO.*;
 import com.example.shelfsensebe.DTO.UserDTO;
 import com.example.shelfsensebe.Model.Component;
+import com.example.shelfsensebe.Model.OptionalComponentField;
 import com.example.shelfsensebe.Model.Supplier;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
@@ -55,9 +56,6 @@ public class ComponentService
 
         component.setUser(user);
         component.setName(textSanitizer.sanitize(component.getName()));
-        component.setType(textSanitizer.sanitize(component.getType()));
-        component.setFootprint(textSanitizer.sanitize(component.getFootprint()));
-        component.setDesignator(component.getDesignator() != null ? textSanitizer.sanitize(component.getDesignator()): null);
 
         if (component.getSupplier() != null) {
             Supplier supplier = component.getSupplier();
@@ -67,6 +65,14 @@ public class ComponentService
             supplier.setManufacturerPart(textSanitizer.sanitize(supplier.getManufacturerPart()));
             supplier.setSupplierPart(supplier.getSupplierPart() != null ? textSanitizer.sanitize(supplier.getSupplierPart()) : null);
             supplier.setComponent(component);
+        }
+
+        if (component.getOptionalComponentFields() != null) {
+            for (OptionalComponentField field : component.getOptionalComponentFields()) {
+                field.setName(textSanitizer.sanitize(field.getName()));
+                field.setValue(textSanitizer.sanitize(field.getValue()));
+                field.setComponent(component);
+            }
         }
 
         Component savedComponent = componentRepository.save(component);
@@ -88,15 +94,12 @@ public class ComponentService
 
         // Sanitize and update fields safely
         existingComponent.setName(textSanitizer.sanitize(updatedComponent.getName()));
-        existingComponent.setType(textSanitizer.sanitize(updatedComponent.getType()));
-        existingComponent.setFootprint(textSanitizer.sanitize(updatedComponent.getFootprint()));
         existingComponent.setPrice(updatedComponent.getPrice());
         existingComponent.setStock(updatedComponent.getStock());
         existingComponent.setSafetyStock(updatedComponent.getSafetyStock());
         existingComponent.setSafetyStockRop(updatedComponent.getSafetyStockRop());
-        existingComponent.setDesignator(updatedComponent.getDesignator() != null ? textSanitizer.sanitize(updatedComponent.getDesignator()) : existingComponent.getDesignator());
 
-        // Handle Supplier update
+        // Handle Supplier update - optimize JPA is handling a lot.
         if (updatedComponent.getSupplier() != null) {
             Supplier existingSupplier;
 
@@ -119,6 +122,18 @@ public class ComponentService
 
             existingSupplier.setSafetyStock(updatedSupplier.getSafetyStock());
             existingSupplier.setSafetyStockRop(updatedSupplier.getSafetyStockRop());
+        }
+
+        // not perfect yet, fix.
+        if (updatedComponent.getOptionalComponentFields() != null) {
+            for (OptionalComponentField field : updatedComponent.getOptionalComponentFields()) {
+                field.setComponent(existingComponent); // Maintain the relationship
+                field.setName(textSanitizer.sanitize(field.getName()));
+                field.setValue(textSanitizer.sanitize(field.getValue()));
+            }
+            existingComponent.setOptionalComponentFields(updatedComponent.getOptionalComponentFields());
+        } else {
+            existingComponent.setOptionalComponentFields(null);
         }
 
         Component savedComponent = componentRepository.save(existingComponent);

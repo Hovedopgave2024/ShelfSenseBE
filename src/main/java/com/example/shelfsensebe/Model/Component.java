@@ -47,21 +47,23 @@ public class Component
     @JsonProperty("stockStatus")
     private Integer stockStatus;
 
-    // Going into optional component fields
+    /*
+    Going into optional component fields for Lars Bjørn
+
     @Column(name = "type", nullable = false)
     @NotNull
     @NotEmpty
     private String type;
 
-    // Going into optional component fields
     @Column(name = "footprint", nullable = false)
     @NotNull
     @NotEmpty
     private String footprint;
 
-    // Going into optional component fields
     @Column(name = "designator")
     private String designator;
+
+    */
 
     @OneToOne(mappedBy = "component", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("component-supplier")
