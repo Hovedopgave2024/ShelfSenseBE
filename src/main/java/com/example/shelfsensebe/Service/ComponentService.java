@@ -66,15 +66,13 @@ public class ComponentService
             supplier.setManufacturer(textSanitizer.sanitize(supplier.getManufacturer()));
             supplier.setManufacturerPart(textSanitizer.sanitize(supplier.getManufacturerPart()));
             supplier.setSupplierPart(supplier.getSupplierPart() != null ? textSanitizer.sanitize(supplier.getSupplierPart()) : null);
-            supplier.setSafetyStock(supplier.getSafetyStock());
-            supplier.setSafetyStockRop(supplier.getSafetyStockRop());
             supplier.setComponent(component);
         }
 
         Component savedComponent = componentRepository.save(component);
 
         savedComponent.setStockStatus(component.getStockStatus());
-        savedComponent.getSupplier().setStockStatus(component.getSupplier().getStockStatus() != null ? component.getSupplier().getStockStatus() : null);
+        savedComponent.getSupplier().setStockStatus(component.getSupplier().getStockStatus());
 
         return savedComponent;
     }
@@ -116,9 +114,6 @@ public class ComponentService
             existingSupplier.setManufacturerPart(textSanitizer.sanitize(updatedSupplier.getManufacturerPart()));
             existingSupplier.setSupplierPart(textSanitizer.sanitize(updatedSupplier.getSupplierPart()));
 
-            existingSupplier.setStock(updatedSupplier.getStock());
-            existingSupplier.setIncomingStock(updatedSupplier.getIncomingStock());
-            existingSupplier.setIncomingDate(updatedSupplier.getIncomingDate());
             existingSupplier.setSafetyStock(updatedSupplier.getSafetyStock());
             existingSupplier.setSafetyStockRop(updatedSupplier.getSafetyStockRop());
         }
@@ -126,7 +121,7 @@ public class ComponentService
         Component savedComponent = componentRepository.save(existingComponent);
 
         savedComponent.setStockStatus(updatedComponent.getStockStatus());
-        savedComponent.getSupplier().setStockStatus(updatedComponent.getSupplier().getStockStatus() != null ? updatedComponent.getSupplier().getStockStatus() : null);
+        savedComponent.getSupplier().setStockStatus(updatedComponent.getSupplier().getStockStatus());
 
         return savedComponent;
     }
@@ -139,7 +134,7 @@ public class ComponentService
         componentRepository.delete(component);
     }
 
-    public List<Component> fetchAndUpdateComponentsWithSupplierInfo(String apiKey) {
+    public void fetchAndUpdateComponentsWithSupplierInfo(String apiKey) {
         // Find components with supplier = Mouser and only fetch the rows in ComponentSupplierDTO
         List<Component> components = componentRepository.findBySupplier_Name("Mouser");
         List<Component> updatedComponents = new ArrayList<>();
@@ -251,8 +246,6 @@ public class ComponentService
         }
 
         componentRepository.saveAll(updatedComponents);
-
-        return updatedComponents;
     }
 
     @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
