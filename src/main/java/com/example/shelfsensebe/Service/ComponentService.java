@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 @Service
+@Transactional
 public class ComponentService
 {
     @Autowired
@@ -48,7 +49,6 @@ public class ComponentService
         }
     }
 
-    @Transactional
     public Component createComponent(Component component, UserDTO userDTO) {
         User user = new User();
         user.setId(userDTO.getId());
