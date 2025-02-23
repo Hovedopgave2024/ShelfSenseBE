@@ -93,11 +93,15 @@ public class ComponentService
         );
         validateOwnership(userDTO, existingComponent);
 
+        // updating component fields
+
         existingComponent.setName(textSanitizer.sanitize(updatedComponent.getName()));
         existingComponent.setPrice(updatedComponent.getPrice());
         existingComponent.setStock(updatedComponent.getStock());
         existingComponent.setSafetyStock(updatedComponent.getSafetyStock());
         existingComponent.setSafetyStockRop(updatedComponent.getSafetyStockRop());
+
+        // updating component supplier fields
 
         if (updatedComponent.getSupplier() == null) {
             existingComponent.setSupplier(null);
@@ -122,6 +126,8 @@ public class ComponentService
             existingSupplier.setSafetyStockRop(updatedSupplier.getSafetyStockRop());
         }
 
+        // updating optional component fields
+
         if (updatedComponent.getOptionalComponentFields() == null) {
             existingComponent.getOptionalComponentFields().clear();
         } else {
@@ -135,6 +141,8 @@ public class ComponentService
         }
 
         Component savedComponent = componentRepository.save(existingComponent);
+
+        // setting stock status from frontend again to the object being returned.
 
         savedComponent.setStockStatus(updatedComponent.getStockStatus() != null ? updatedComponent.getStockStatus() : null);
 
