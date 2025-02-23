@@ -1,5 +1,6 @@
 package com.example.shelfsensebe.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,18 +23,22 @@ public class User {
     private String password;
 
     @JsonManagedReference("user-componentList")
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Component> componentList;
 
     @JsonManagedReference("user-productList")
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> productList;
 
     @JsonManagedReference("user-salesOrderList")
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SalesOrder> salesOrderList;
 
     @JsonManagedReference("user-apiUpdate")
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ApiUpdate apiUpdate;
+
+    @JsonManagedReference("user-optionalComponentTemplate")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OptionalComponentTemplate> optionalComponentTemplates;
 }
