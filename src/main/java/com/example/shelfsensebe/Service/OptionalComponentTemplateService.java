@@ -46,7 +46,7 @@ public class OptionalComponentTemplateService {
 
         existingOptionalComponentTemplate.setName(textSanitizer.sanitize(updatedOptionalComponentTemplate.getName()));
 
-        if(updatedOptionalComponentTemplate.getOptionalComponentTemplateFields() == null) {
+        if(updatedOptionalComponentTemplate.getOptionalComponentTemplateFields() == null || updatedOptionalComponentTemplate.getOptionalComponentTemplateFields().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least one field is required in the template.");
         }
         existingOptionalComponentTemplate.getOptionalComponentTemplateFields().clear();
