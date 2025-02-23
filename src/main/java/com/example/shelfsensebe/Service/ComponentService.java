@@ -8,6 +8,7 @@ import com.example.shelfsensebe.Model.Supplier;
 import com.example.shelfsensebe.Model.User;
 import com.example.shelfsensebe.Repository.ComponentRepository;
 import com.example.shelfsensebe.utility.TextSanitizer;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -86,30 +87,28 @@ public class ComponentService
         return savedComponent;
     }
 
-    public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO) {
+    public Component updateComponent(int id, Component updatedComponent, UserDTO userDTO) throws BadRequestException {
         Component existingComponent = componentRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Component Not Found")
+                new BadRequestException("Component Not Found")
         );
         validateOwnership(userDTO, existingComponent);
 
-        // Sanitize and update fields safely
         existingComponent.setName(textSanitizer.sanitize(updatedComponent.getName()));
         existingComponent.setPrice(updatedComponent.getPrice());
         existingComponent.setStock(updatedComponent.getStock());
         existingComponent.setSafetyStock(updatedComponent.getSafetyStock());
         existingComponent.setSafetyStockRop(updatedComponent.getSafetyStockRop());
 
-        // Handle Supplier update - optimize JPA is handling a lot.
-        if (updatedComponent.getSupplier() != null) {
+        if (updatedComponent.getSupplier() == null) {
+            existingComponent.setSupplier(null);
+        } else {
             Supplier existingSupplier;
 
             if (existingComponent.getSupplier() == null) {
-                // Create a new supplier if one does not exist
                 existingSupplier = new Supplier();
                 existingSupplier.setComponent(existingComponent);
                 existingComponent.setSupplier(existingSupplier);
             } else {
-                // Use the existing supplier
                 existingSupplier = existingComponent.getSupplier();
             }
 
@@ -119,21 +118,20 @@ public class ComponentService
             existingSupplier.setManufacturer(textSanitizer.sanitize(updatedSupplier.getManufacturer()));
             existingSupplier.setManufacturerPart(textSanitizer.sanitize(updatedSupplier.getManufacturerPart()));
             existingSupplier.setSupplierPart(textSanitizer.sanitize(updatedSupplier.getSupplierPart()));
-
             existingSupplier.setSafetyStock(updatedSupplier.getSafetyStock());
             existingSupplier.setSafetyStockRop(updatedSupplier.getSafetyStockRop());
         }
 
-        // not perfect yet, fix.
-        if (updatedComponent.getOptionalComponentFields() != null) {
+        if (updatedComponent.getOptionalComponentFields() == null) {
+            existingComponent.getOptionalComponentFields().clear();
+        } else {
+            existingComponent.getOptionalComponentFields().clear();
             for (OptionalComponentField field : updatedComponent.getOptionalComponentFields()) {
-                field.setComponent(existingComponent); // Maintain the relationship
+                field.setComponent(existingComponent);
                 field.setName(textSanitizer.sanitize(field.getName()));
                 field.setValue(textSanitizer.sanitize(field.getValue()));
+                existingComponent.getOptionalComponentFields().add(field);
             }
-            existingComponent.setOptionalComponentFields(updatedComponent.getOptionalComponentFields());
-        } else {
-            existingComponent.setOptionalComponentFields(null);
         }
 
         Component savedComponent = componentRepository.save(existingComponent);
