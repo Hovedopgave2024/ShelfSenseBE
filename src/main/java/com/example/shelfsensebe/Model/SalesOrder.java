@@ -1,14 +1,17 @@
 package com.example.shelfsensebe.Model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,10 +22,6 @@ public class SalesOrder
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "quantity", nullable = false)
-    @Min(1)
-    private int quantity;
-
     @Column(name = "price", nullable = false)
     @Min(0)
     private double price;
@@ -31,12 +30,10 @@ public class SalesOrder
     @PastOrPresent
     private Date createdDate;
 
-    @Column(name = "product_id", nullable = false)
-    @Min(1)
-    private int productId;
-
-    @Column(name = "product_name", nullable = false)
-    private String productName;
+    @JsonManagedReference("salesOrder-salesOrderProductList")
+    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Valid
+    private List<SalesOrderProduct> salesOrderProducts;
 
     @JsonBackReference("user-salesOrderList")
     @ManyToOne
