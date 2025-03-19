@@ -6,7 +6,10 @@ import org.springframework.stereotype.Component;
 public class TextSanitizer {
 
     public String sanitize(String input) {
-            return input.replaceAll("<", "")
+        if (input == null) {
+            return null; // or return a default value
+        }
+        return input.replaceAll("<", "")
                 .replaceAll(">", "")
                 .replaceAll("&", "")
                 .replaceAll("\"", "")

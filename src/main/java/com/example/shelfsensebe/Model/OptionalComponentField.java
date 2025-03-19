@@ -21,9 +21,7 @@ public class OptionalComponentField {
     @NotEmpty
     private String name;
 
-    @Column(name = "value", nullable = false)
-    @NotNull
-    @NotEmpty
+    @Column(name = "value")
     private String value;
 
     @JsonBackReference("component-optionalComponentField")
