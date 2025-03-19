@@ -7,7 +7,7 @@ public class TextSanitizer {
 
     public String sanitize(String input) {
         if (input == null) {
-            return null; // or return a default value
+            return null;
         }
         return input.replaceAll("<", "")
                 .replaceAll(">", "")
