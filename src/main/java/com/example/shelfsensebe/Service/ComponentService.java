@@ -275,6 +275,7 @@ public class ComponentService
         componentRepository.saveAll(updatedComponents);
     }
 
+    // every day at 2am:
     @Scheduled(cron = "0 0 2 * * ?", zone = "Europe/Copenhagen")
     // test every minute: @Scheduled(cron = "0 * * * * ?", zone = "Europe/Copenhagen")
     // test every 10 seconds: @Scheduled(cron = "*/10 * * * * ?", zone = "Europe/Copenhagen")
