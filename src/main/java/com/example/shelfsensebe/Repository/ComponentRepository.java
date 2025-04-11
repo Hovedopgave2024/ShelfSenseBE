@@ -11,5 +11,5 @@ public interface ComponentRepository extends JpaRepository<Component, Integer> {
 
     List<Component> findByUser_Id(int userId);
 
-    List<Component> findBySupplier(String supplier);
+    List<Component> findBySupplier_Name(String supplierName);
 }

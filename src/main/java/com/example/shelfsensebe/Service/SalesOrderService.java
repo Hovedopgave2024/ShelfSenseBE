@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class SalesOrderService {
 
     @Autowired
@@ -27,7 +28,6 @@ public class SalesOrderService {
     @Autowired
     ComponentRepository componentRepository;
 
-    @Transactional
     public SalesOrder createSalesOrder(SalesOrder salesOrder, UserDTO userDTO) {
         // Set the user to the sales order
         User user = new User();
@@ -84,7 +84,6 @@ public class SalesOrderService {
         return salesOrderRepository.save(salesOrder);
     }
 
-    @Transactional
     public void deleteSalesOrder(int salesOrderId) {
         // Fetch the SalesOrder
         SalesOrder salesOrder = salesOrderRepository.findById(salesOrderId).orElseThrow(() ->

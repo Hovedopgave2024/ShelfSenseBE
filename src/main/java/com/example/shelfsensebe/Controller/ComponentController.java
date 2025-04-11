@@ -7,6 +7,7 @@ import com.example.shelfsensebe.Service.ApiUpdateService;
 import com.example.shelfsensebe.Service.ComponentService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class ComponentController {
         }
 
         @PutMapping("/components/{id}")
-        public ResponseEntity<Component> updateComponent(@Valid @PathVariable int id, @RequestBody Component updatedComponent, HttpSession session) {
+        public ResponseEntity<Component> updateComponent(@Valid @PathVariable int id, @RequestBody Component updatedComponent, HttpSession session) throws BadRequestException {
             UserDTO userDTO = (UserDTO) session.getAttribute("user");
             if (userDTO == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

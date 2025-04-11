@@ -47,7 +47,6 @@ public class ProductService
         productRepository.delete(product);
     }
 
-    @Transactional
     public Product updateProduct(Product updatedProduct) {
         // Fetch the existing product from the database
         Product existingProduct = productRepository.findById(updatedProduct.getId())
