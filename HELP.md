@@ -1,3 +1,27 @@
+# Application properties setup:
+## in folder: main -> resources
+
+spring.application.name=ShelfSenseBE
+
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+server.address=${SERVER_ADDRESS}
+server.port=${SERVER_PORT}
+
+apiKey=${API_KEY}
+
+server.servlet.session.cookie.same-site=None
+server.servlet.session.cookie.secure=true
+
+spring.jpa.hibernate.ddl-auto=update
+
+server.servlet.session.timeout=30m
+
+spring.jpa.properties.hibernate.jdbc.batch_size=10
+
+
 # Getting Started
 
 ### Reference Documentation
